@@ -7,4 +7,4 @@ tsconfig.tsbuildinfo
 dist
 
 # storage of application objects
-db/*
+data/**/*

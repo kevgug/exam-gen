@@ -1,14 +1,25 @@
-import express, { Request, Response } from "express";
+import express from "express";
+import Persist from "node-persist";
+import path from "node:path";
+import routes from "./routes";
+import { DATA_DIR, multistore } from "./common";
 
 const app = express();
 const port = 3000;
 
-app.get("/", (req: Request, res: Response) => {
-  res.send("Hello, TypeScript with Express!");
-});
+const store: multistore = {
+  file: Persist.create({ dir: path.join(DATA_DIR, "db", "file") }),
+  obj: Persist.create({ dir: path.join(DATA_DIR, "db", "obj") }),
+};
 
-app.post("/exam/submit", (req: Request, res: Response) => {});
+(async () => {
+  Object.values(store).map((s) => s.init());
 
-app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
-});
+  app.post("/exam/upload", (...args) => routes.exam.upload(store, ...args));
+  app.get("/exam/download", (...args) => routes.exam.download(store, ...args));
+  app.delete("/exam/delete", (...args) => routes.exam.delete(store, ...args));
+
+  app.listen(port, () => {
+    console.log(`Server running at http://localhost:${port}`);
+  });
+})();
