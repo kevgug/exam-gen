@@ -1,4 +1,9 @@
 node_modules
+
+# build
+tsconfig.tsbuildinfo
+
+# build artifacts
 dist
 
 # storage of application objects
