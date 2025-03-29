@@ -7,6 +7,8 @@ app.get("/", (req: Request, res: Response) => {
   res.send("Hello, TypeScript with Express!");
 });
 
+app.post("/exam/submit", (req: Request, res: Response) => {});
+
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
 });

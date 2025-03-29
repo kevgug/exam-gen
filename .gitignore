@@ -1,2 +1,5 @@
 node_modules
 dist
+
+# storage of application objects
+db/*
