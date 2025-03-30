@@ -24,103 +24,83 @@ export class QuestionCore {
       text: {
         format: {
           type: "json_schema",
-          name: "questionRootList",
-          description: "Array of exam question root objects",
+          name: "questionRootSchema",
+          description: "Schema for a collection of exam question roots",
           schema: {
-            type: "array",
-            items: {
-              type: "object",
-              properties: {
-                examId: {
-                  type: "string",
-                  description: "Unique identifier of the exam",
-                },
-                pointWeighting: {
+            type: "object",
+            properties: {
+              questions: {
+                type: "array",
+                items: {
                   type: "object",
-                  description:
-                    "Normalized point distribution between question types",
                   properties: {
-                    "multiple-choice": {
-                      type: "number",
+                    examId: { type: "string" },
+                    pointWeighting: {
+                      type: "object",
+                      properties: {
+                        "multiple-choice": { type: "number" },
+                        "numerical-response": { type: "number" },
+                        "written-response": { type: "number" },
+                      },
+                      required: [
+                        "multiple-choice",
+                        "numerical-response",
+                        "written-response",
+                      ],
+                      additionalProperties: false,
                     },
-                    "numerical-response": {
-                      type: "number",
-                    },
-                    "written-response": {
-                      type: "number",
+                    parts: {
+                      $ref: "#/$defs/Parts",
                     },
                   },
-                  required: [
-                    "multiple-choice",
-                    "numerical-response",
-                    "written-response",
-                  ],
+                  required: ["examId", "pointWeighting", "parts"],
                   additionalProperties: false,
                 },
-                parts: {
-                  type: "array",
-                  description: "Root-level question parts",
-                  items: { $ref: "#/$defs/QuestionOrWrapper" },
-                },
               },
-              required: ["examId", "pointWeighting", "parts"],
-              additionalProperties: false,
             },
+            required: ["questions"],
+            additionalProperties: false,
             $defs: {
-              QuestionOrWrapper: {
-                type: "object",
-                oneOf: [
-                  { $ref: "#/$defs/Question" },
-                  { $ref: "#/$defs/QuestionWrapper" },
-                ],
-              },
-              Question: {
-                type: "object",
-                properties: {
-                  type: {
-                    type: "string",
-                    enum: [
-                      "multiple-choice",
-                      "written-response",
-                      "numerical-response",
-                    ],
-                  },
-                  content: {
-                    type: "string",
-                  },
-                  children: {
-                    type: "array",
-                    items: { $ref: "#/$defs/QuestionOrWrapper" },
-                  },
-                  numMultipleChoice: {
-                    type: ["number", "null"],
-                  },
-                  points: {
-                    type: "number",
-                  },
+              Parts: {
+                type: "array",
+                items: {
+                  anyOf: [
+                    {
+                      type: "object",
+                      properties: {
+                        type: {
+                          type: "string",
+                          enum: [
+                            "multiple-choice",
+                            "written-response",
+                            "numerical-response",
+                          ],
+                        },
+                        content: { type: "string" },
+                        children: { $ref: "#/$defs/Parts" },
+                        numMultipleChoice: { type: ["number", "null"] },
+                        points: { type: "number" },
+                      },
+                      required: [
+                        "type",
+                        "content",
+                        "children",
+                        "numMultipleChoice",
+                        "points",
+                      ],
+                      additionalProperties: false,
+                    },
+                    {
+                      type: "object",
+                      properties: {
+                        content: { type: "string" },
+                        children: { $ref: "#/$defs/Parts" },
+                      },
+                      required: ["content", "children"],
+                      additionalProperties: false,
+                    },
+                  ],
                 },
-                required: [
-                  "type",
-                  "content",
-                  "children",
-                  "numMultipleChoice",
-                  "points",
-                ],
-                additionalProperties: false,
-              },
-              QuestionWrapper: {
-                type: "object",
-                properties: {
-                  content: {
-                    type: "string",
-                  },
-                  children: {
-                    type: "array",
-                    items: { $ref: "#/$defs/QuestionOrWrapper" },
-                  },
-                },
-                required: ["content", "children"],
-                additionalProperties: false,
               },
             },
           },
