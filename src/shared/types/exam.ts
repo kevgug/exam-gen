@@ -1,6 +1,12 @@
 import { PointWeighting } from "./common";
+import { QuestionTree } from "./question";
 
 export type ExamMetadata = {
-  length: number;
+  numQuestions: number;
   weighting: PointWeighting;
+};
+
+export type Exam = {
+  questions: QuestionTree[];
+  metadata: ExamMetadata;
 };
