@@ -1,10 +1,157 @@
 import OpenAI from "openai";
 import { Exam } from "../../shared/types/exam";
+import { Question, QuestionGroup } from "../../shared/types/question";
 
 const openai = new OpenAI();
 
 export class ExamCore {
-  public static async generateFromQuestions({
+  private static traverse = (
+    questionGroup: QuestionGroup,
+    fn: (node: Question | QuestionGroup) => void,
+  ) => {
+    const toVisit = [questionGroup];
+    while (toVisit.length > 0) {
+      const current = toVisit.pop();
+      if (current) {
+        fn(current);
+        if ("subItems" in current && current.subItems) {
+          toVisit.push(...(current.subItems as QuestionGroup[]));
+        }
+      }
+    }
+  };
+
+  public static async getFromMarkdown(mdStr: string): Promise<Exam> {
+    const cleanMd = await openai.responses
+      .create({
+        model: "chatgpt-4o-latest",
+        input: [
+          {
+            role: "system",
+            content:
+              "Remove artifacts from OCR as well as any page references or references to continued questions or physical pages. Output just the md, nothing else.",
+          },
+          {
+            role: "user",
+            content: mdStr,
+          },
+        ],
+      })
+      .then((response) => response.output_text);
+
+    console.log(cleanMd);
+
+    // Invoke LLM
+    const response = await openai.responses.create({
+      model: "chatgpt-4o-latest",
+      input: [
+        {
+          role: "system",
+          content:
+            "You are STEM teacher. Convert the markdown exam into structured JSON. Going from a question number to question letter (a) means introducing a new question subgroup, as does going from a question letter to roman numeral (i), and so on. Question types are: multiple choice, numerical response (question asking for computation), and freeform response (question asking for explanation or reciting knowledge). For each multiple choice question, put the number of multiple choice choice options in the optional `numMultipleChoice` field. You MUST include all questions from the md.",
+        },
+        {
+          role: "user",
+          content: cleanMd,
+        },
+      ],
+      text: {
+        format: {
+          type: "json_schema",
+          name: "examSchema",
+          description: "Schema for a STEM exam",
+          schema: {
+            type: "object",
+            properties: {
+              questionGroups: {
+                $ref: "#/$defs/NodeList",
+              },
+            },
+            required: ["questionGroups"],
+            additionalProperties: false,
+            $defs: {
+              NodeList: {
+                type: "array",
+                items: {
+                  anyOf: [
+                    {
+                      type: "object",
+                      properties: {
+                        type: {
+                          type: "string",
+                          enum: [
+                            "multiple-choice",
+                            "freeform-response",
+                            "numerical-response",
+                          ],
+                        },
+                        content: { type: "string" },
+                        multipleChoiceOptions: {
+                          type: ["array", "null"],
+                          items: { type: "string" },
+                        },
+                        points: { type: "number" },
+                      },
+                      required: [
+                        "type",
+                        "content",
+                        "multipleChoiceOptions",
+                        "points",
+                      ],
+                      additionalProperties: false,
+                    },
+                    {
+                      type: "object",
+                      properties: {
+                        content: { type: "string" },
+                        subItems: { $ref: "#/$defs/NodeList" },
+                      },
+                      required: ["content", "subItems"],
+                      additionalProperties: false,
+                    },
+                  ],
+                },
+              },
+            },
+          },
+          strict: true,
+        },
+      },
+    });
+
+    // Parse LLM response as json
+    let exam: Exam;
+    try {
+      exam = JSON.parse(response.output_text) as Exam;
+    } catch (e: any) {
+      throw new Error("failed to parse ocr output into array of questions");
+    }
+
+    console.log("exam", exam);
+
+    const validQuestionGroups = exam.questionGroups.filter((questionGroup) => {
+      let invalid = false;
+
+      this.traverse(questionGroup, (node) => {
+        if (
+          "type" in node &&
+          node.type === "multiple-choice" &&
+          (!node.multipleChoiceOptions ||
+            node.multipleChoiceOptions.length === 0)
+        ) {
+          invalid = true;
+        }
+      });
+
+      return !invalid;
+    });
+
+    return {
+      questionGroups: validQuestionGroups,
+    } as Exam;
+  }
+
+  public static async generateNew({
     className,
     classDescription,
     pastExams,
@@ -57,12 +204,12 @@ export class ExamCore {
                 properties: {
                   "multiple-choice": { type: "number" },
                   "numerical-response": { type: "number" },
-                  "written-response": { type: "number" },
+                  "freeform-response": { type: "number" },
                 },
                 required: [
                   "multiple-choice",
                   "numerical-response",
-                  "written-response",
+                  "freeform-response",
                 ],
                 additionalProperties: false,
               },
@@ -79,7 +226,7 @@ export class ExamCore {
                     type: "string",
                     enum: [
                       "multiple-choice",
-                      "written-response",
+                      "freeform-response",
                       "numerical-response",
                     ],
                   },

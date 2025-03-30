@@ -1,0 +1,319 @@
+{
+  "questionGroups": [
+    {
+      "content": "Question 1",
+      "subItems": [
+        {
+          "type": "freeform-response",
+          "content": "(a) Outline why a force acts on the airboat due to the fan blade.",
+          "multipleChoiceOptions": null,
+          "points": 1
+        },
+        {
+          "type": "numerical-response",
+          "content": "(b)(i) Show that a mass of about 240 kg of air moves through the fan every second.",
+          "multipleChoiceOptions": null,
+          "points": 1
+        },
+        {
+          "type": "numerical-response",
+          "content": "(b)(ii) Show that the tension in the rope is about 5 kN.",
+          "multipleChoiceOptions": null,
+          "points": 1
+        },
+        {
+          "type": "freeform-response",
+          "content": "(b)(iii) Show that the airboat moves away from the bank. The variation with time \\( t \\) of the speed \\( v \\) of the airboat is shown for the motion.",
+          "multipleChoiceOptions": null,
+          "points": 1
+        },
+        {
+          "type": "freeform-response",
+          "content": "(b)(iv) Explain why the airboat has a maximum speed under these conditions.",
+          "multipleChoiceOptions": null,
+          "points": 1
+        },
+        {
+          "type": "numerical-response",
+          "content": "(b)(v) Estimate the distance the airboat travels to reach its maximum speed.",
+          "multipleChoiceOptions": null,
+          "points": 1
+        },
+        {
+          "type": "numerical-response",
+          "content": "(b)(vi) Deduce the mass of the airboat.",
+          "multipleChoiceOptions": null,
+          "points": 1
+        }
+      ]
+    },
+    {
+      "content": "Question 2",
+      "subItems": [
+        {
+          "type": "numerical-response",
+          "content": "(a) Calculate the number of gas particles in the cylinder.",
+          "multipleChoiceOptions": null,
+          "points": 1
+        },
+        {
+          "type": "freeform-response",
+          "content": "(b)(i) Discuss the changes that occur in the density of the gas.",
+          "multipleChoiceOptions": null,
+          "points": 1
+        },
+        {
+          "type": "freeform-response",
+          "content": "(b)(ii) Discuss the changes that occur in the internal energy of the gas.",
+          "multipleChoiceOptions": null,
+          "points": 1
+        }
+      ]
+    },
+    {
+      "content": "Question 3",
+      "subItems": [
+        {
+          "type": "freeform-response",
+          "content": "(a)(i) Explain the variation in intensity.",
+          "multipleChoiceOptions": null,
+          "points": 1
+        },
+        {
+          "type": "numerical-response",
+          "content": "(a)(ii) Adjacent minima are separated by a distance of 0.12 m. Calculate \\( f \\).",
+          "multipleChoiceOptions": null,
+          "points": 1
+        },
+        {
+          "type": "freeform-response",
+          "content": "(b) The metal plate is replaced by a wooden plate that reflects a lower intensity sound wave than the metal plate.\nState and explain the differences between the sound intensities detected by the same microphone with the metal plate and the wooden plate.",
+          "multipleChoiceOptions": null,
+          "points": 1
+        }
+      ]
+    },
+    {
+      "content": "Question 4",
+      "subItems": [
+        {
+          "type": "freeform-response",
+          "content": "(a) Identify the laws of conservation that are represented by Kirchhoff's circuit laws.",
+          "multipleChoiceOptions": null,
+          "points": 1
+        },
+        {
+          "type": "freeform-response",
+          "content": "(b)(i) State the emf of the cell.",
+          "multipleChoiceOptions": null,
+          "points": 1
+        },
+        {
+          "type": "numerical-response",
+          "content": "(b)(ii) Deduce the internal resistance of the cell.",
+          "multipleChoiceOptions": null,
+          "points": 1
+        },
+        {
+          "type": "numerical-response",
+          "content": "(c)(i) Calculate the reading on the voltmeter.",
+          "multipleChoiceOptions": null,
+          "points": 1
+        },
+        {
+          "type": "freeform-response",
+          "content": "(c)(ii) Comment on the implications of your answer to (c)(i) for cell B.",
+          "multipleChoiceOptions": null,
+          "points": 1
+        },
+        {
+          "type": "freeform-response",
+          "content": "(d)(i) Outline why electricity is a secondary energy source.",
+          "multipleChoiceOptions": null,
+          "points": 1
+        },
+        {
+          "type": "freeform-response",
+          "content": "(d)(ii) Some fuel sources are renewable. Outline what is meant by renewable.",
+          "multipleChoiceOptions": null,
+          "points": 1
+        },
+        {
+          "type": "numerical-response",
+          "content": "(e)(i) A fully charged cell of emf 6.0 V delivers a constant current of 5.0 A for a time of 0.25 hour until it is completely discharged.\n\nThe cell is then re-charged by a rectangular solar panel of dimensions \\( 0.40 \\ \\text{m} \\times 0.15 \\ \\text{m} \\) at a place where the maximum intensity of sunlight is \\( 380 \\ \\mathrm{W \\ m}^{-2} \\).\n\nThe overall efficiency of the re-charging process is 18%.\nCalculate the minimum time required to re-charge the cell fully.",
+          "multipleChoiceOptions": null,
+          "points": 1
+        },
+        {
+          "type": "freeform-response",
+          "content": "(e)(ii) Outline why research into solar cell technology is important to society.",
+          "multipleChoiceOptions": null,
+          "points": 1
+        }
+      ]
+    },
+    {
+      "content": "Question 5",
+      "subItems": [
+        {
+          "type": "freeform-response",
+          "content": "(a) Outline how the count rate was corrected for background radiation.",
+          "multipleChoiceOptions": null,
+          "points": 1
+        },
+        {
+          "type": "numerical-response",
+          "content": "(b) When a single piece of thin copper foil is placed between the source and detector, the count rate is 810 count/min. The foil is replaced with one that has three times the thickness. Estimate the new count rate.",
+          "multipleChoiceOptions": null,
+          "points": 1
+        },
+        {
+          "type": "freeform-response",
+          "content": "(c) Further results were obtained in this experiment with copper and lead absorbers.\n\n| Absorber | Thickness / mm | Corrected count rate / count/min |\n|----------|----------------|-----------------------------------|\n| copper   | 3.5            | 32                                |\n| lead     | 3.5            | 10                                |\n\nComment on the radiation detected from this radioactive source.",
+          "multipleChoiceOptions": null,
+          "points": 1
+        },
+        {
+          "type": "freeform-response",
+          "content": "(d) Another radioactive source consists of a nuclide of caesium \\( \\, _{55}^{137} \\mathrm{Cs} \\) that decays to barium \\( \\, _{56}^{137} \\mathrm{Ba} \\).  \nWrite down the reaction for this decay.",
+          "multipleChoiceOptions": null,
+          "points": 1
+        }
+      ]
+    },
+    {
+      "content": "Question 6",
+      "subItems": [
+        {
+          "type": "numerical-response",
+          "content": "(a)(i) Calculate the frequency of the oscillation for both tests.",
+          "multipleChoiceOptions": null,
+          "points": 1
+        },
+        {
+          "type": "numerical-response",
+          "content": "(a)(ii) Deduce \\( \\frac{k_{1}}{k_{2}} \\).",
+          "multipleChoiceOptions": null,
+          "points": 1
+        },
+        {
+          "type": "numerical-response",
+          "content": "(a)(iii) Determine the amplitude of oscillation for test 1.",
+          "multipleChoiceOptions": null,
+          "points": 1
+        },
+        {
+          "type": "freeform-response",
+          "content": "(a)(iv) In test 2, the maximum elastic potential energy \\( E_p \\) stored in the spring is 44 J.\n\nWhen \\( t = 0 \\), the value of \\( E_p \\) for test 2 is zero.  \nSketch, on the axes, the variation with time of \\( E_p \\) for test 2.",
+          "multipleChoiceOptions": null,
+          "points": 1
+        },
+        {
+          "type": "numerical-response",
+          "content": "(b) The motion sensor operates by detecting the sound waves reflected from the base of the mass. The sensor compares the frequency detected with the frequency emitted when the signal returns.\n\nThe sound frequency emitted by the sensor is 35 kHz. The speed of sound is \\( 340 \\ \\mathrm{ms}^{-1} \\).\n\nDetermine the maximum frequency change detected by the sensor for test 2.",
+          "multipleChoiceOptions": null,
+          "points": 1
+        }
+      ]
+    },
+    {
+      "content": "Question 7",
+      "subItems": [
+        {
+          "type": "freeform-response",
+          "content": "(a) Outline what is meant by electric potential at a point.",
+          "multipleChoiceOptions": null,
+          "points": 1
+        },
+        {
+          "type": "numerical-response",
+          "content": "(b) The electric potential at a point a distance 2.8 m from the centre of the sphere is 7.71 kV. Determine the radius of the sphere.",
+          "multipleChoiceOptions": null,
+          "points": 1
+        },
+        {
+          "type": "freeform-response",
+          "content": "(c)(i) Comment on the angle at which the object meets equipotential surfaces around the sphere.",
+          "multipleChoiceOptions": null,
+          "points": 1
+        },
+        {
+          "type": "numerical-response",
+          "content": "(c)(ii) Show that the kinetic energy of the object is about 0.7 mJ.",
+          "multipleChoiceOptions": null,
+          "points": 1
+        },
+        {
+          "type": "freeform-response",
+          "content": "(c)(iii) Determine whether the object will reach the surface of the sphere.",
+          "multipleChoiceOptions": null,
+          "points": 1
+        }
+      ]
+    },
+    {
+      "content": "Question 8",
+      "subItems": [
+        {
+          "type": "numerical-response",
+          "content": "(a)(i) Write down the maximum magnitude of the rate of change of flux linked with the coil.",
+          "multipleChoiceOptions": null,
+          "points": 1
+        },
+        {
+          "type": "freeform-response",
+          "content": "(a)(ii) State the fundamental SI unit for your answer to (a)(i).",
+          "multipleChoiceOptions": null,
+          "points": 1
+        },
+        {
+          "type": "freeform-response",
+          "content": "(b)(i) Explain why the graph becomes negative.",
+          "multipleChoiceOptions": null,
+          "points": 1
+        },
+        {
+          "type": "freeform-response",
+          "content": "(b)(ii) Outline why the areas between the \\( t \\)-axis and the curve for these two parts are likely to be the same.",
+          "multipleChoiceOptions": null,
+          "points": 1
+        },
+        {
+          "type": "freeform-response",
+          "content": "(c) Predict the changes to the graph when the magnet is dropped from a lower height above the coil.",
+          "multipleChoiceOptions": null,
+          "points": 1
+        }
+      ]
+    },
+    {
+      "content": "Question 9",
+      "subItems": [
+        {
+          "type": "freeform-response",
+          "content": "(a)(i) Identify a property of electrons demonstrated by this experiment.",
+          "multipleChoiceOptions": null,
+          "points": 1
+        },
+        {
+          "type": "numerical-response",
+          "content": "(a)(ii) Show that the energy \\( E \\) of each electron in the beam is about \\( 7 \\times 10^{-11} \\ \\mathrm{J} \\).",
+          "multipleChoiceOptions": null,
+          "points": 1
+        },
+        {
+          "type": "numerical-response",
+          "content": "(a)(iii) The de Broglie wavelength for an electron is given by \\( \\frac{hc}{E} \\). Show that the diameter of an oxygen-16 nucleus is about 4 fm.",
+          "multipleChoiceOptions": null,
+          "points": 1
+        },
+        {
+          "type": "numerical-response",
+          "content": "(b) Estimate, using the result in (a)(iii), the volume of a tin-118 (\\( _{50}^{118} \\mathrm{Sn} \\)) nucleus. State your answer to an appropriate number of significant figures.",
+          "multipleChoiceOptions": null,
+          "points": 1
+        }
+      ]
+    }
+  ]
+}
