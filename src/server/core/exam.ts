@@ -155,7 +155,7 @@ export class ExamCore {
 
   public static async generateNew({
     className,
-    classDescription,
+    classDescription = "",
     pastExams,
   }: {
     className: string;
@@ -238,6 +238,7 @@ export class ExamCore {
         },
       },
     });
+    console.log(response.output_text);
 
     const newExam = JSON.parse(response.output_text) as Exam;
     return newExam;

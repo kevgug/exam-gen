@@ -12,12 +12,19 @@ export default async (port: number) => {
     obj: Persist.create({ dir: path.join(DATA_DIR, "db", "obj") }),
   };
 
+  const wrap =
+    (fn: any) =>
+    (...args: any[]) =>
+      fn(store, ...args);
+
   Object.values(store).map((s) => s.init());
 
   // exam crd endpoints
-  app.post("/exam/upload", (...args) => routes.exam.upload(store, ...args));
-  app.get("/exam/download", (...args) => routes.exam.download(store, ...args));
-  app.delete("/exam/delete", (...args) => routes.exam.delete(store, ...args));
+  app.post("/exam/upload", wrap(routes.exam.upload));
+  app.get("/exam/get", wrap(routes.exam.get));
+  app.get("/exam/download", wrap(routes.exam.download));
+  app.delete("/exam/delete", wrap(routes.exam.delete));
+  app.get("/exam/generate", wrap(routes.exam.generate));
 
   app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);
