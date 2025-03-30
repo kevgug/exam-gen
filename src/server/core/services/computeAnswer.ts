@@ -60,9 +60,6 @@ export class ComputeAnswerService {
     });
     console.log(steps);
 
-      return text.trim();
-    }
-
-    return "";
+    return text.trim();
   }
 }
