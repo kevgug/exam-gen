@@ -1,8 +1,32 @@
-import { fork } from "node:child_process";
-import { FileMetadata, multistore } from "../config";
+import { fork, spawn } from "node:child_process";
+import { DATA_DIR, FileMetadata, multistore } from "../config";
 import { Id } from "../../shared/types/common";
-import { Question } from "../../shared/types/question";
+import { Question, QuestionGroup } from "../../shared/types/question";
 import { Exam } from "../../shared/types/exam";
+import path from "path";
+import { unlink, writeFile } from "node:fs/promises";
+
+export const createMd = async (mdpath: string, exam: Exam) => {
+  let n = 0;
+  const questions = exam.questionGroups
+    .flatMap((group) => {
+      const collectQuestions = (item: Question | QuestionGroup): string[] => {
+        if ("subItems" in item) {
+          return item.subItems.flatMap(collectQuestions);
+        } else {
+          return [item.content];
+        }
+      };
+      return ++n + ".\n" + collectQuestions(group);
+    })
+    .join("\n\n");
+
+  const markdownContent = `# Exam Questions\n\n${questions}`;
+  writeFile(mdpath, markdownContent);
+};
+
+export const convertMdPdf = async (mdpath: string, pdfpath: string) =>
+  spawn("pandoc", [mdpath, "-o", pdfpath]);
 
 export class ExamProcessingWorker {
   store: multistore;
@@ -50,7 +74,9 @@ export class ExamGenerationWorker {
 
     Promise.all(
       ids.map((id) =>
-        this.store.obj.get(id).then((item) => process.send(JSON.stringify(item))),
+        this.store.obj
+          .get(id)
+          .then((item) => process.send(JSON.stringify(item))),
       ),
     );
 
@@ -60,7 +86,25 @@ export class ExamGenerationWorker {
       exam.generated = true;
       this.store.obj.set(id, exam);
 
-      console.log(`finished exam generation for ${id}. exiting worker...`);
+      console.log(`finished exam generation for ${id}. generating pdf...`);
+
+      const mdpath = path.join(DATA_DIR, "tmp", `${id}.md`);
+      createMd(mdpath, exam);
+
+      console.log("markdown file generated. converting to pdf...");
+      const file: FileMetadata = {
+        filename: `${id}.pdf`,
+        path: path.join(DATA_DIR, "file", `${id}.pdf`),
+      };
+
+      convertMdPdf(mdpath, file.path).then((process) =>
+        process.on("exit", async () => {
+          console.log("pdf file generated... removing markdown file...");
+          await unlink(mdpath);
+          console.log(`finished pdf generation for ${id}. exiting worker...`);
+        }),
+      );
+      this.store.file.set(id, file);
     });
   }
 }
