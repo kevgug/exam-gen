@@ -1,4 +1,4 @@
-import { PointWeighting } from "./common";
+import { Id, PointWeighting } from "./common";
 import { QuestionTree } from "./question";
 
 export type ExamMetadata = {
