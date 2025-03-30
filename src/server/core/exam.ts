@@ -1,19 +1,20 @@
 import OpenAI from "openai";
 import { Exam } from "../../shared/types/exam";
 import { Question, QuestionGroup } from "../../shared/types/question";
+import { ComputeAnswerService } from "./services/computeAnswer";
 
 const openai = new OpenAI();
 
 export class ExamCore {
-  private static traverse = (
+  private static traverse = async (
     questionGroup: QuestionGroup,
-    fn: (node: Question | QuestionGroup) => void,
+    fn: (node: Question | QuestionGroup) => Promise<void>,
   ) => {
     const toVisit = [questionGroup];
     while (toVisit.length > 0) {
       const current = toVisit.pop();
       if (current) {
-        fn(current);
+        await fn(current); // await the callback function
         if ("subItems" in current && current.subItems) {
           toVisit.push(...(current.subItems as QuestionGroup[]));
         }
@@ -22,26 +23,22 @@ export class ExamCore {
   };
 
   public static async getFromMarkdown(mdStr: string): Promise<Exam> {
-    // const cleanMd = await openai.responses
-    //   .create({
-    //     model: "chatgpt-4o-latest",
-    //     input: [
-    //       {
-    //         role: "system",
-    //         content:
-    //           "Remove artifacts from OCR as well as any page references or references to continued questions or physical pages. Output just the md, nothing else.",
-    //       },
-    //       {
-    //         role: "user",
-    //         content: mdStr,
-    //       },
-    //     ],
-    //   })
-    //   .then((response) => response.output_text);
-
-    // console.log(cleanMd);
-
-    const cleanMd = mdStr;
+    const cleanMd = await openai.responses
+      .create({
+        model: "chatgpt-4o-latest",
+        input: [
+          {
+            role: "system",
+            content:
+              "Remove artifacts from OCR as well as any page references or references to continued questions or physical pages. Output just the md, nothing else.",
+          },
+          {
+            role: "user",
+            content: mdStr,
+          },
+        ],
+      })
+      .then((response) => response.output_text);
 
     // Invoke LLM
     const response = await openai.responses.create({
@@ -138,7 +135,7 @@ export class ExamCore {
     const validQuestionGroups = exam.questionGroups.filter((questionGroup) => {
       let invalid = false;
 
-      this.traverse(questionGroup, (node) => {
+      this.traverse(questionGroup, async (node) => {
         if (
           "type" in node &&
           node.type === "multiple-choice" &&
@@ -249,8 +246,27 @@ export class ExamCore {
 
     const newExam = JSON.parse(response.output_text) as Exam;
 
-    // Build markscheme
-    // TODO: traverse
+    console.log("before:\n", JSON.stringify(newExam));
+
+    for (const rootGroup of newExam.questionGroups) {
+      console.log("-- root group--");
+      let prevQuestions: Question[] = [];
+
+      // Await the traverse function
+      await this.traverse(rootGroup, async (node) => {
+        if ("content" in node) {
+          // type is Question
+          const answer = await ComputeAnswerService.answer({
+            prevQuestions: prevQuestions,
+            currQuestion: node as Question,
+          });
+          node.answer = answer;
+          prevQuestions.push(node);
+        }
+      });
+    }
+
+    console.log("with answers:\n", JSON.stringify(newExam));
 
     return newExam;
   }

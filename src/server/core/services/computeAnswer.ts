@@ -1,11 +1,15 @@
 import { createOpenAI } from "@ai-sdk/openai";
-import { executeTool } from "freestyle-sandboxes/src/ai";
+import { createGoogleGenerativeAI } from "@ai-sdk/google";
+import { executeTool } from "freestyle-sandboxes/ai";
 
 import { Question } from "../../../shared/types/question";
 import { generateText } from "ai";
 
 const openai = createOpenAI({
   compatibility: "strict",
+});
+const google = createGoogleGenerativeAI({
+  apiKey: process.env.GEMINI_API_KEY,
 });
 const codeExecutor = executeTool({
   apiKey: "X1WoDa3f9GBTdEKNTTwY5y-BH12wGGZQhswcakKHSzB8TLfKrZy2Ytn1zW9Fq8SRSbv",
@@ -35,18 +39,21 @@ export class ComputeAnswerService {
       const { text, steps } = await generateText({
         system:
           "You are an expert STEM teacher. Given a question, write down just the answer/s and nothing else. Unless specified, give numerical answers to 3 s.f. with the correct units",
-        model: openai("gpt-4o"),
+        // model: openai("gpt-4o"),
+        model: google("gemini-1.5-flash"),
         maxSteps: 5,
         maxRetries: 0,
         prompt: `<context>${context}</context>\nConcisely write any and all valid solutions to this question for a markscheme: <question>${currQuestion.content}</question><type>${currQuestion.type}</type>.`,
       });
+      console.log(steps);
 
       return text;
     }
 
     // Call Freestyle with tool
     const { text, steps } = await generateText({
-      model: openai("gpt-4o"),
+      // model: openai("gpt-4o"),
+      model: google("gemini-1.5-flash"),
       tools: {
         codeExecutor,
       },

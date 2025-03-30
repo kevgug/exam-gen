@@ -15,12 +15,12 @@ export default {
 
     bb.on("file", async (name, file, info) => {
       const { filename, encoding, mimeType } = info;
-      const [_, ext] = filename.split("."); // XXX: filename cannot contain more than one .
+      // const [_, ext] = filename.split("."); // XXX: filename cannot contain more than one .
 
       // generate unique id for this file
       const id = crypto.randomUUID();
       const filemeta: FileMetadata = {
-        path: path.join(DATA_DIR, "file", `${id}.${ext}`),
+        path: path.join(DATA_DIR, "file", `${id}.pdf`),
         filename,
       };
 
