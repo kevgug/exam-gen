@@ -6,5 +6,5 @@ export type Id = string;
 export type PointWeighting = {
   "multiple-choice": number;
   "numerical-response": number;
-  "written-response": number;
+  "freeform-response": number;
 };

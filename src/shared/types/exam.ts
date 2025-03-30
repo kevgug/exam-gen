@@ -1,5 +1,5 @@
 import { Id, PointWeighting } from "./common";
-import { QuestionTree } from "./question";
+import { QuestionGroup } from "./question";
 
 export type ExamMetadata = {
   numQuestions: number;
@@ -7,6 +7,6 @@ export type ExamMetadata = {
 };
 
 export type Exam = {
-  questions: QuestionTree[];
-  metadata: ExamMetadata;
+  questionGroups: QuestionGroup[];
+  // metadata: ExamMetadata;
 };

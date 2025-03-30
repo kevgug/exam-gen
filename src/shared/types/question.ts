@@ -1,20 +1,14 @@
 import { Id, PointWeighting } from "./common";
 
-export type QuestionTree = {
-  examId: Id;
-  pointWeighting: PointWeighting;
-  root: (QuestionNode | QuestionGroupNode)[];
-};
-
-export type QuestionNode = {
-  type: "multiple-choice" | "written-response" | "numerical-response";
+export type Question = {
+  type: "multiple-choice" | "freeform-response" | "numerical-response";
   content: string;
-  numMultipleChoice: number | null;
   multipleChoiceOptions: string[] | null;
   points: number;
 };
 
-export type QuestionGroupNode = {
-  content: string;
-  children: (QuestionNode | QuestionGroupNode)[];
+export type QuestionGroup = {
+  content: string; // could be a parent question or context
+  nextQuestionIndex: string | number; // 1,2,3 vs a,b,c vs i,ii,iii
+  subItems: (Question | QuestionGroup)[];
 };
