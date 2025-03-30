@@ -1,12 +1,32 @@
-import { QuestionRoot } from "../../shared/types/question";
+import {
+  QuestionGroupNode,
+  QuestionNode,
+  QuestionTree,
+} from "../../shared/types/question";
 import OpenAI from "openai";
 
 const openai = new OpenAI();
 
+const traverse = (
+  tree: QuestionTree,
+  fn: (node: QuestionNode | QuestionGroupNode) => void,
+) => {
+  const toVisit = [...tree.root];
+  while (toVisit.length > 0) {
+    const current = toVisit.pop();
+    if (current) {
+      fn(current);
+      if ("children" in current && current.children) {
+        toVisit.push(...current.children);
+      }
+    }
+  }
+};
+
 export class QuestionCore {
   public static async generateQuestionsFromMd(
     mdStr: string,
-  ): Promise<QuestionRoot[]> {
+  ): Promise<QuestionTree[]> {
     // Invoke LLM
     const response = await openai.responses.create({
       model: "chatgpt-4o-latest",
@@ -14,7 +34,7 @@ export class QuestionCore {
         {
           role: "system",
           content:
-            "You are an expert at structured data extraction. You will be given unstructured markdown of an exam and should convert it recursively into an exam question structure.",
+            "You are STEM teacher parsing markdown into structured JSON. Given the unstructured markdown, recursively process each question, building out a tree for each question using the given data structures. Never include the answer in the question content; only for multiple choice make note of number of multiple-choice options in `numMultipleChoice`. You MUST include all questions from the md in the trees.",
         },
         {
           role: "user",
@@ -24,8 +44,9 @@ export class QuestionCore {
       text: {
         format: {
           type: "json_schema",
-          name: "questionRootSchema",
-          description: "Schema for a collection of exam question roots",
+          name: "examSchema",
+          description:
+            "Schema for questions in a STEM exam. Each question is represented by a tree",
           schema: {
             type: "object",
             properties: {
@@ -34,26 +55,11 @@ export class QuestionCore {
                 items: {
                   type: "object",
                   properties: {
-                    examId: { type: "string" },
-                    pointWeighting: {
-                      type: "object",
-                      properties: {
-                        "multiple-choice": { type: "number" },
-                        "numerical-response": { type: "number" },
-                        "written-response": { type: "number" },
-                      },
-                      required: [
-                        "multiple-choice",
-                        "numerical-response",
-                        "written-response",
-                      ],
-                      additionalProperties: false,
-                    },
-                    parts: {
-                      $ref: "#/$defs/Parts",
+                    root: {
+                      $ref: "#/$defs/Nodes",
                     },
                   },
-                  required: ["examId", "pointWeighting", "parts"],
+                  required: ["root"],
                   additionalProperties: false,
                 },
               },
@@ -61,7 +67,7 @@ export class QuestionCore {
             required: ["questions"],
             additionalProperties: false,
             $defs: {
-              Parts: {
+              Nodes: {
                 type: "array",
                 items: {
                   anyOf: [
@@ -77,14 +83,12 @@ export class QuestionCore {
                           ],
                         },
                         content: { type: "string" },
-                        children: { $ref: "#/$defs/Parts" },
                         numMultipleChoice: { type: ["number", "null"] },
                         points: { type: "number" },
                       },
                       required: [
                         "type",
                         "content",
-                        "children",
                         "numMultipleChoice",
                         "points",
                       ],
@@ -94,7 +98,7 @@ export class QuestionCore {
                       type: "object",
                       properties: {
                         content: { type: "string" },
-                        children: { $ref: "#/$defs/Parts" },
+                        children: { $ref: "#/$defs/Nodes" },
                       },
                       required: ["content", "children"],
                       additionalProperties: false,
@@ -110,13 +114,25 @@ export class QuestionCore {
     });
 
     // Parse LLM response as json
-    let questions: QuestionRoot[];
+    let questions;
     try {
-      questions = JSON.parse(response.output_text) as QuestionRoot[];
+      questions = (
+        JSON.parse(response.output_text) as { questions: QuestionTree[] }
+      ).questions;
     } catch (e: any) {
       throw new Error("failed to parse ocr output into array of questions");
     }
 
-    return questions;
+    return questions.filter((tree) => {
+      let invalid = false;
+
+      traverse(tree, (node) => {
+        if ("type" in node && !node.numMultipleChoice) {
+          invalid = true;
+        }
+      });
+
+      return !invalid;
+    });
   }
 }

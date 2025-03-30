@@ -1,20 +1,19 @@
 import { Id, PointWeighting } from "./common";
 
-export type QuestionRoot = {
+export type QuestionTree = {
   examId: Id;
   pointWeighting: PointWeighting;
-  parts: (Question | QuestionWrapper)[];
+  root: (QuestionNode | QuestionGroupNode)[];
 };
 
-export type Question = {
+export type QuestionNode = {
   type: "multiple-choice" | "written-response" | "numerical-response";
   content: string;
-  children: (Question | QuestionWrapper)[];
   numMultipleChoice: number | null;
   points: number;
 };
 
-export type QuestionWrapper = {
+export type QuestionGroupNode = {
   content: string;
-  children: (Question | QuestionWrapper)[];
+  children: (QuestionNode | QuestionGroupNode)[];
 };
