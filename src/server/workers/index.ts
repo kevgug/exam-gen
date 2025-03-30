@@ -14,7 +14,7 @@ export const createMd = async (mdpath: string, exam: Exam, answer = false) => {
         if ("subItems" in item) {
           return item.subItems.flatMap(collectQuestions);
         } else {
-          return [item.content + answer ? "\n" + item.answer : ""];
+          return [item.content + (answer ? "\n" + item.answer : "")];
         }
       };
       return ++n + ".\n" + collectQuestions(group);
