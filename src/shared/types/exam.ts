@@ -1,4 +1,4 @@
-import { PointWeighting } from "../../server/core/common";
+import { PointWeighting } from "./common";
 
 export type ExamMetadata = {
   file: string;

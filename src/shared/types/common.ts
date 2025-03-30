@@ -1,8 +1,4 @@
-export enum QuestionType {
-  MULTIPLE_CHOICE,
-  WRITTEN_RESPONSE,
-  NUMERICAL_RESPONSE,
-}
+import { QuestionType } from "./question";
 
 export type ID = string;
 export type Unit = string; // TODO: could be more careful and make an enumeration

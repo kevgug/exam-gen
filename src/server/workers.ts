@@ -1,0 +1,3 @@
+class ExamProcessingWorker {
+  constructor() {}
+}

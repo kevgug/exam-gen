@@ -1,10 +1,10 @@
-import { ID, PointWeighting, QuestionType, Unit } from "../../server/core/common";
+import { ID, PointWeighting, Unit } from "./common";
 
 /**
  * Represents a part (e.g., part a) to a question. A question part may or may
  *  not have values and/or an answer.
  */
-type QuestionPart = {
+export type QuestionPart = {
   type: QuestionType;
   strippedContent: string;
   variables: {
@@ -21,7 +21,7 @@ type QuestionPart = {
  * Represents the phrasing of a question. A question scheme is used to generate
  *  new variations to the question.
  */
-type QuestionScheme = {
+export type QuestionScheme = {
   /**
    * ID of exam that this question scheme was sourced from.
    */
@@ -40,8 +40,14 @@ type QuestionScheme = {
  * Represents an instance of a generated question. All generated questions will
  *  originate from a question scheme (which can be backreferenced by schemeId).
  */
-type GeneratedQuestion = {
+export type GeneratedQuestion = {
   schemeId: ID;
   diagram?: string;
   parts: QuestionPart[];
 };
+
+export enum QuestionType {
+    MULTIPLE_CHOICE,
+    WRITTEN_RESPONSE,
+    NUMERICAL_RESPONSE,
+  }
