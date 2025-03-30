@@ -35,9 +35,9 @@ export class ComputeAnswerService {
       // No computation necessary; generate answer traditionally
       const { text, steps } = await generateText({
         system:
-          "You are an expert STEM teacher. Given a question, write down just the answer/s and nothing else. Unless specified, give numerical answers to 3 s.f. with the correct units",
-        // model: openai("gpt-4o"),
-        model: google("gemini-1.5-flash"),
+          "You are an expert STEM teacher. Given an exam question, determine the correct answer/s.",
+        model: openai("gpt-4o"),
+        // model: google("gemini-1.5-flash"),
         maxSteps: 5,
         maxRetries: 0,
         prompt: `<context>${context}</context>\nConcisely state the answer/s: <question>${currQuestion.content}</question><type>${currQuestion.type}</type>. State just the answer/s, nothing else.`,
@@ -46,35 +46,57 @@ export class ComputeAnswerService {
 
       return text.trim();
     } else if (currQuestion.type === "numerical-response") {
-      // Call Freestyle via tool
-      const { text, steps } = await generateText({
-        // model: openai("gpt-4o"),
-        model: google("gemini-1.5-flash"),
+      const { reasoning, steps: reasoningSteps } = await generateText({
+        model: openai("gpt-4o"),
+        // model: google("gemini-1.5-flash"),
+        system:
+          "You are an expert STEM teacher. Given an exam question, compute the correct answer with the correct units along with your reasoning.",
         tools: {
           codeExecutor,
         },
         maxSteps: 5,
         maxRetries: 0,
-        prompt: `<context>${context}</context>\nAnswer:<question>${currQuestion.content}</question><type>${currQuestion.type}</type>. State just the answer with the correct units, nothing else. Use code executor for useful computation.`,
+        prompt: `<context>${context}</context>\nAnswer:<question>${currQuestion.content}</question><type>${currQuestion.type}</type>. Use code executor for any computation.`,
       });
-      console.log(steps);
+      console.log("reasoningSteps: ", reasoningSteps);
 
-      return text.trim();
+      const { text: finalAnswer } = await generateText({
+        model: openai("gpt-4o"),
+        // model: google("gemini-1.5-flash"),
+        system:
+          "You are an expert STEM teacher. Given an exam question and your thought process, write down just the answer/s and nothing else. Unless specified, give numerical answers to 3 s.f. along with the correct units",
+        maxSteps: 5,
+        maxRetries: 0,
+        prompt: `<question>${currQuestion.content}</question><reasoning>${reasoning}</reasoning>`,
+      });
+
+      return finalAnswer.trim();
     } else if (currQuestion.type === "multiple-choice") {
-      // Call Freestyle via tool
-      const { text, steps } = await generateText({
-        // model: openai("gpt-4o"),
-        model: google("gemini-1.5-flash"),
+      const { reasoning, steps: reasoningSteps } = await generateText({
+        model: openai("gpt-4o"),
+        // model: google("gemini-1.5-flash"),
+        system:
+          "You are an expert STEM teacher. Given a multiple choice exam question, compute the correct answer along with your reasoning.",
         tools: {
           codeExecutor,
         },
         maxSteps: 5,
         maxRetries: 0,
-        prompt: `<context>${context}</context>\nAnswer:<question>${currQuestion.content}</question><choices>${currQuestion.multipleChoiceOptions}</choices>. State just the correct letter, nothing else. Use code executor for useful computation.`,
+        prompt: `<context>${context}</context>\nAnswer:<question>${currQuestion.content}</question><choices>${currQuestion.multipleChoiceOptions}</choices>. Use code executor for all computation, however simple.`,
       });
-      console.log(steps);
+      console.log("reasoningSteps: ", reasoningSteps);
 
-      return text.trim();
+      const { text: finalAnswer } = await generateText({
+        model: openai("gpt-4o"),
+        // model: google("gemini-1.5-flash"),
+        system:
+          "You are an expert STEM teacher. Given a multiple choice exam question and your thought process, state just the answer choice letter and nothing else",
+        maxSteps: 5,
+        maxRetries: 0,
+        prompt: `<question>${currQuestion.content}</question><reasoning>${reasoning}</reasoning>`,
+      });
+
+      return finalAnswer.trim();
     }
 
     return "";
