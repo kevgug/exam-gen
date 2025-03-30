@@ -2,7 +2,10 @@ import express from "express";
 import Persist from "node-persist";
 import path from "node:path";
 import routes from "./routes";
-import { DATA_DIR, multistore } from "./config";
+import { DATA_DIR, FileMetadata, multistore } from "./config";
+import { convertMdPdf, createMd, ExamProcessingWorker } from "./workers";
+import { unlink } from "node:fs/promises";
+import { Exam } from "../shared/types/exam";
 
 export default async (port: number) => {
   const app = express();
@@ -19,14 +22,14 @@ export default async (port: number) => {
 
   Object.values(store).map((s) => s.init());
 
-  // exam crd endpoints
-  app.post("/exam/upload", wrap(routes.exam.upload));
-  app.get("/exam/get", wrap(routes.exam.get));
-  app.get("/exam/download", wrap(routes.exam.download));
-  app.delete("/exam/delete", wrap(routes.exam.delete));
-  app.get("/exam/generate", wrap(routes.exam.generate));
+    // exam crd endpoints
+    app.post("/exam/upload", wrap(routes.exam.upload));
+    app.get("/exam/get", wrap(routes.exam.get));
+    app.get("/exam/download", wrap(routes.exam.download));
+    app.delete("/exam/delete", wrap(routes.exam.delete));
+    app.get("/exam/generate", wrap(routes.exam.generate));
 
-  app.listen(port, () => {
-    console.log(`Server running at http://localhost:${port}`);
-  });
+    app.listen(port, () => {
+      console.log(`Server running at http://localhost:${port}`);
+    });
 };
