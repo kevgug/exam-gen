@@ -1,4 +1,5 @@
 import express from "express";
+import cors from "cors"; // Import the cors middleware
 import Persist from "node-persist";
 import path from "node:path";
 import routes from "./routes";
@@ -8,19 +9,22 @@ import { unlink } from "node:fs/promises";
 import { Exam } from "../shared/types/exam";
 
 export default async (port: number) => {
-  const app = express();
+    const app = express();
 
-  const store: multistore = {
-    file: Persist.create({ dir: path.join(DATA_DIR, "db", "file") }),
-    obj: Persist.create({ dir: path.join(DATA_DIR, "db", "obj") }),
-  };
+    // Enable CORS
+    app.use(cors());
 
-  const wrap =
-    (fn: any) =>
-    (...args: any[]) =>
-      fn(store, ...args);
+    const store: multistore = {
+        file: Persist.create({ dir: path.join(DATA_DIR, "db", "file") }),
+        obj: Persist.create({ dir: path.join(DATA_DIR, "db", "obj") }),
+    };
 
-  Object.values(store).map((s) => s.init());
+    const wrap =
+        (fn: any) =>
+        (...args: any[]) =>
+            fn(store, ...args);
+
+    Object.values(store).map((s) => s.init());
 
     // exam crd endpoints
     app.post("/exam/upload", wrap(routes.exam.upload));
@@ -30,6 +34,6 @@ export default async (port: number) => {
     app.get("/exam/generate", wrap(routes.exam.generate));
 
     app.listen(port, () => {
-      console.log(`Server running at http://localhost:${port}`);
+        console.log(`Server running at http://localhost:${port}`);
     });
 };

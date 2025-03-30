@@ -102,10 +102,10 @@ export class ExamGenerationWorker {
         convertMdPdf(mdpath, file.path).then((process) =>
           process.on("exit", async () => {
             console.log("pdf file generated... removing markdown file...");
-            await unlink(mdpath);
+            // await unlink(mdpath);
             console.log(`finished pdf generation for ${id}. exiting worker...`);
           }),
-        );
+        ).catch(console.error);
 
         this.store.file.set(id, file);
       } catch (e) {

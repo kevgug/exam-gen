@@ -1,10 +1,10 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { FileDown, Trash2, Loader2, AlertCircle } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { useState, useEffect } from "react";
+import { FileDown, Trash2, Loader2, AlertCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -14,52 +14,59 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
+} from "@/components/ui/alert-dialog";
 
 interface Exam {
-  id: string
-  name: string
-  createdAt: string
+  id: string;
+  name: string;
+  createdAt: string;
 }
 
 interface ExamListProps {
-  exams: Exam[]
-  isLoading: boolean
-  onDelete: (id: string) => void
+  isLoading: boolean;
 }
 
-export function ExamList({ exams, isLoading, onDelete }: ExamListProps) {
-  const [downloadingId, setDownloadingId] = useState<string | null>(null)
-  const [examToDelete, setExamToDelete] = useState<string | null>(null)
+export function ExamList({
+  isLoading,
+}: ExamListProps) {
+  const [exams, setExams] = useState<string[]>([]);
+  const [downloadingId, setDownloadingId] = useState<string | null>(null);
+  const [examToDelete, setExamToDelete] = useState<string | null>(null);
+
+    useEffect(() => {
+        setExams(JSON.parse(localStorage.getItem("generatedExamIds")));
+    }, []);
 
   const handleDownload = async (examId: string) => {
-    setDownloadingId(examId)
+    setDownloadingId(examId);
     try {
-      window.location.href = `/exam/download?id=${examId}`
+      window.location.href = `http://localhost:3000/exam/download?id=${examId}`;
     } catch (error) {
-      console.error("Error downloading exam:", error)
+      console.error("Error downloading exam:", error);
     } finally {
-      setTimeout(() => setDownloadingId(null), 1000)
+      setTimeout(() => setDownloadingId(null), 1000);
     }
-  }
+  };
 
   const confirmDelete = (examId: string) => {
-    setExamToDelete(examId)
-  }
+    setExamToDelete(examId);
+  };
 
   const handleDeleteConfirm = () => {
     if (examToDelete) {
-      onDelete(examToDelete)
-      setExamToDelete(null)
+      const updatedExams = exams.filter((id) => id !== examToDelete);
+      setExams(updatedExams);
+      localStorage.setItem("generatedExamIds", JSON.stringify(updatedExams));
+      setExamToDelete(null);
     }
-  }
+  };
 
   if (isLoading) {
     return (
       <div className="flex justify-center items-center py-12">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
-    )
+    );
   }
 
   if (exams.length === 0) {
@@ -67,38 +74,39 @@ export function ExamList({ exams, isLoading, onDelete }: ExamListProps) {
       <Alert>
         <AlertCircle className="h-4 w-4" />
         <AlertTitle>No exams found</AlertTitle>
-        <AlertDescription>Upload exam PDFs and generate new exams to see them here.</AlertDescription>
+        <AlertDescription>
+          Upload exam PDFs and generate new exams to see them here.
+        </AlertDescription>
       </Alert>
-    )
+    );
   }
 
   return (
     <div className="space-y-4">
-      {exams.map((exam) => (
-        <Card key={exam.id}>
+      {exams.map((id) => (
+        <Card key={id}>
           <CardContent className="p-4">
             <div className="flex justify-between items-center">
-              <div>
-                <h3 className="font-medium">{exam.name}</h3>
-                <p className="text-sm text-muted-foreground">
-                  Generated on {new Date(exam.createdAt).toLocaleDateString()}
-                </p>
-              </div>
+                <div></div>
               <div className="flex gap-2">
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => handleDownload(exam.id)}
-                  disabled={downloadingId === exam.id}
+                  onClick={() => handleDownload(id)}
+                  disabled={downloadingId === id}
                 >
-                  {downloadingId === exam.id ? (
+                  {downloadingId === id ? (
                     <Loader2 className="h-4 w-4 mr-1 animate-spin" />
                   ) : (
                     <FileDown className="h-4 w-4 mr-1" />
                   )}
                   Download
                 </Button>
-                <Button variant="outline" size="sm" onClick={() => confirmDelete(exam.id)}>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => confirmDelete(id)}
+                >
                   <Trash2 className="h-4 w-4 text-destructive" />
                 </Button>
               </div>
@@ -107,21 +115,26 @@ export function ExamList({ exams, isLoading, onDelete }: ExamListProps) {
         </Card>
       ))}
 
-      <AlertDialog open={examToDelete !== null} onOpenChange={(open) => !open && setExamToDelete(null)}>
+      <AlertDialog
+        open={examToDelete !== null}
+        onOpenChange={(open) => !open && setExamToDelete(null)}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the exam.
+              This action cannot be undone. This will permanently delete the
+              exam.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeleteConfirm}>Delete</AlertDialogAction>
+            <AlertDialogAction onClick={handleDeleteConfirm}>
+              Delete
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
     </div>
-  )
+  );
 }
-
