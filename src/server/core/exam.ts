@@ -50,7 +50,7 @@ export class ExamCore {
         {
           role: "system",
           content:
-            "You are STEM teacher. Convert the markdown exam into structured JSON. Going from a question number to question letter (a) means introducing a new question subgroup, as does going from a question letter to roman numeral (i), and so on. You must include the relevant question letter and roman numerals at the start of `content`, but never inside `contentGroup`. Question types are: multiple choice, numerical response (question asking for computation), and freeform response (question asking for explanation or reciting knowledge). For each multiple choice question, put the number of multiple choice choice options in the optional `numMultipleChoice` field. You MUST include all questions from the md.",
+            "You are STEM teacher. Convert the markdown exam into structured JSON. Going from a question number to question letter (a) means introducing a new question subgroup, as does going from a question letter to roman numeral (i), and so on. You must include the relevant question letter and roman numerals at the start of `content`, but never inside `contentGroup`. Question types are: multiple choice, numerical response (question asking for computation), and freeform response (question asking for explanation or reciting knowledge). For each multiple choice question, put the number of multiple choice choice options in the `multipleChoiceOptionCount` field. You MUST include all questions from the md.",
         },
         {
           role: "user",
@@ -88,6 +88,9 @@ export class ExamCore {
                           ],
                         },
                         content: { type: "string" },
+                        multipleChoiceOptionCount: {
+                          type: ["number", "null"],
+                        },
                         multipleChoiceOptions: {
                           type: ["array", "null"],
                           items: { type: "string" },
@@ -97,6 +100,7 @@ export class ExamCore {
                       required: [
                         "type",
                         "content",
+                        "multipleChoiceOptionCount",
                         "multipleChoiceOptions",
                         "points",
                       ],
@@ -138,8 +142,7 @@ export class ExamCore {
         if (
           "type" in node &&
           node.type === "multiple-choice" &&
-          (!node.multipleChoiceOptions ||
-            node.multipleChoiceOptions.length === 0)
+          !node.multipleChoiceOptionCount
         ) {
           invalid = true;
         }
@@ -168,7 +171,7 @@ export class ExamCore {
       input: [
         {
           role: "system",
-          content: `You are teacher for the STEM class <className>${className}</className><classDescription>${classDescription}</classDescription>.\nYou are writing a new exam, based on past exams. The newly generated exam MUST be as close as possible in composition (order of questions, type of questions, weighting of different question types, use of subquestions, etc.) to all past exams. The generated exam may contain past questions exactly, under the condition that all numerical values are different. The generated exam may, and it is strongly encouraged to, contain completely novel questions, under the condition that each question tests the same material as questions in past exams.\nRecursively create the exam, building out a tree for each question using the given data structures.`,
+          content: `You are teacher for the STEM class <className>${className}</className><classDescription>${classDescription}</classDescription>.\nYou are writing a new exam, based on past exams. The newly generated exam MUST be as close as possible in composition (order of questions, type of questions, weighting of different question types, use of subquestions, etc.) to all past exams. The generated exam may contain past questions exactly, under the condition that all numerical values are different. The generated exam may, and it is strongly encouraged to, contain completely novel questions, under the condition that each question tests the same material as questions in past exams. For each multiple choice question, the answer choices must be set as the multipleChoiceOptions. \nRecursively create the exam, building out a tree for each question using the given data structures.`,
         },
         {
           role: "user",
@@ -206,6 +209,9 @@ export class ExamCore {
                           ],
                         },
                         content: { type: "string" },
+                        multipleChoiceOptionCount: {
+                          type: ["number", "null"],
+                        },
                         multipleChoiceOptions: {
                           type: ["array", "null"],
                           items: { type: "string" },
@@ -215,6 +221,7 @@ export class ExamCore {
                       required: [
                         "type",
                         "content",
+                        "multipleChoiceOptionCount",
                         "multipleChoiceOptions",
                         "points",
                       ],
@@ -241,6 +248,10 @@ export class ExamCore {
     console.log(response.output_text);
 
     const newExam = JSON.parse(response.output_text) as Exam;
+
+    // Build markscheme
+    // TODO: traverse
+
     return newExam;
   }
 }
