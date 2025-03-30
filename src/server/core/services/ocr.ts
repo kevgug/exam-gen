@@ -5,7 +5,18 @@ const mistralClient = new Mistral({
   apiKey: process.env.MISTRAL_API_KEY ?? "",
 });
 
+/**
+ * Service for Optical Character Recognition (OCR) operations.
+ * Handles PDF text extraction using Mistral's OCR API and
+ * processes results into markdown with embedded images.
+ */
 export class OcrService {
+  /**
+   * Replaces image placeholders in markdown with base64 representations.
+   * @param mdString - Markdown string containing image placeholders
+   * @param imgRecord - Record mapping image names to base64 strings
+   * @returns Markdown with replaced image references
+   */
   private static replaceImagesInMd({
     mdString,
     imgRecord: imageMap,
@@ -22,6 +33,12 @@ export class OcrService {
     return mdString;
   }
 
+  /**
+   * Combines markdown content from all pages in an OCR response.
+   * Processes embedded images and incorporates them into the markdown.
+   * @param ocrResponse - OCR response containing pages with markdown and images
+   * @returns Combined markdown string with all content and embedded images
+   */
   private static getCombinedMd(ocrResponse: OCRResponse): string {
     const markdowns: string[] = [];
 
@@ -43,6 +60,14 @@ export class OcrService {
     return markdowns.join("\n\n");
   }
 
+  /**
+   * Extracts text and images from a PDF using Mistral OCR API.
+   * Uploads PDF, processes it, and returns combined markdown.
+   * @param pdfName - Name of the PDF file
+   * @param pdfBuffer - Buffer containing PDF data
+   * @returns Promise resolving to markdown with extracted content
+   * @throws Error if no pages were processed by OCR
+   */
   public static async extractTextFromPdf({
     pdfName,
     pdfBuffer,
@@ -79,5 +104,14 @@ export class OcrService {
 
     // Return combined markdown
     return this.getCombinedMd(ocrResponse);
+  }
+
+  /**
+   * Removes all image references from a markdown string.
+   * @param mdStr - Markdown string containing image references
+   * @returns Markdown with all image references removed
+   */
+  public static mdWithoutImgs(mdStr: string) {
+    return mdStr.replace(/!\[.*?\]\(.*?\)/g, "");
   }
 }

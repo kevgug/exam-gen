@@ -1,4 +1,7 @@
-import { ID, PointWeighting, Unit } from "./common";
+import { Id, PointWeighting, Unit } from "./common";
+
+export type QuestionText = string;
+export type QuestionImg = string;
 
 /**
  * Represents a part (e.g., part a) to a question. A question part may or may
@@ -17,23 +20,22 @@ export type QuestionPart = {
   points: number;
 };
 
+export type QuestionChunkType = "text" | ";
+export type QuestionChunk = {
+  type: QuestionChunkType;
+  value: QuestionText | QuestionImg | QuestionPart;
+};
+
 /**
  * Represents the phrasing of a question. A question scheme is used to generate
  *  new variations to the question.
  */
-export type QuestionScheme = {
-  /**
-   * ID of exam that this question scheme was sourced from.
-   */
-  location: ID;
-  /**
-   * Pages of the containing exam that contain this question.
-   */
-  pages: number[];
+export type Question = {
+  examId: Id;
   content: string;
   diagram?: string;
   points: PointWeighting;
-  parts: QuestionPart[];
+  parts: QuestionChunk[];
 };
 
 /**
@@ -41,13 +43,12 @@ export type QuestionScheme = {
  *  originate from a question scheme (which can be backreferenced by schemeId).
  */
 export type GeneratedQuestion = {
-  schemeId: ID;
+  schemeId: Id;
   diagram?: string;
   parts: QuestionPart[];
 };
 
-export enum QuestionType {
-    MULTIPLE_CHOICE,
-    WRITTEN_RESPONSE,
-    NUMERICAL_RESPONSE,
-  }
+export type QuestionType =
+  | "multiple-choice"
+  | "written-response"
+  | "numerical-response";
