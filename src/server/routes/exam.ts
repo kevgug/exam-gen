@@ -3,7 +3,8 @@ import fs from "node:fs";
 import busboy from "busboy";
 import { Request, Response } from "express";
 import { DATA_DIR, FileMetadata, multistore } from "../config";
-import { ExamProcessingWorker } from "../workers";
+import { ExamGenerationWorker, ExamProcessingWorker } from "../workers";
+import { Exam } from "../../shared/types/exam";
 
 export default {
   upload: (store: multistore, req: Request, res: Response, ..._: any[]) => {
@@ -39,6 +40,29 @@ export default {
     });
 
     req.pipe(bb);
+  },
+
+  get: async (
+    store: multistore,
+    req: Request,
+    res: Response,
+    ...args: any[]
+  ) => {
+    const id = req.query?.id?.toString();
+
+    if (!id) {
+      res.status(422).send("missing id");
+      return;
+    }
+
+    const exam: Exam | undefined = await store.obj.get(id);
+
+    if (!exam) {
+      res.status(404).send("no exam with given id found");
+      return;
+    }
+
+    res.status(200).json(exam);
   },
 
   download: async (
@@ -93,5 +117,29 @@ export default {
     await store.file.del(id);
 
     res.status(200).send();
+  },
+
+  generate: async (
+    store: multistore,
+    req: Request,
+    res: Response,
+    ...args: any[]
+  ) => {
+    const ids = req.query?.ids?.toString().split(",") ?? [];
+
+    console.log(ids);
+
+    if (ids.length === 0) {
+      res.status(422).send("missing ids");
+      return;
+    }
+
+    // start generation worker
+    const worker = new ExamGenerationWorker(store);
+
+    const id = crypto.randomUUID();
+    worker.start(ids, id);
+
+    res.status(200).send({ id });
   },
 };

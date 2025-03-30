@@ -7,6 +7,7 @@ export type ExamMetadata = {
 };
 
 export type Exam = {
+  generated: boolean | undefined;
   questionGroups: QuestionGroup[];
   // metadata: ExamMetadata;
 };

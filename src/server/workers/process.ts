@@ -2,8 +2,8 @@ import dotenv from "dotenv";
 dotenv.config();
 
 import { readFile, writeFile } from "node:fs/promises";
-import { QuestionCore } from "../core/question";
 import { OcrService } from "../core/services/ocr";
+import { ExamCore } from "../core/exam";
 
 if (!process.send) {
   console.error("error: no IPC. were we forked?");
@@ -31,14 +31,14 @@ const path = process.argv[2];
   );
 
   console.log(`[WORKER#${process.pid}] ocr done. parsing questions...`);
-  writeFile("tmp.md", md);
+//   writeFile("tmp.md", md);
 
-  const questions = await QuestionCore.generateQuestionsFromMd(md);
-  writeFile("tmp.json", JSON.stringify(questions));
+  const exam = await ExamCore.getFromMarkdown(md);
+//   writeFile("tmp.json", JSON.stringify(exam));
 
   console.log(
     `[WORKER#${process.pid}] question parsing done. sending questions to parent...`,
   );
 
-  questions.map((question) => process.send?.(JSON.stringify(question)));
+  process.send?.(JSON.stringify(exam));
 })();
