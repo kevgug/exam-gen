@@ -15,6 +15,7 @@ const store: multistore = {
 (async () => {
   Object.values(store).map((s) => s.init());
 
+  // exam crd endpoints
   app.post("/exam/upload", (...args) => routes.exam.upload(store, ...args));
   app.get("/exam/download", (...args) => routes.exam.download(store, ...args));
   app.delete("/exam/delete", (...args) => routes.exam.delete(store, ...args));

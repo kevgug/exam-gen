@@ -1,5 +1,7 @@
+import { ID, PointWeighting, QuestionType, Unit } from "../common";
+
 /**
- * Represents a part (e.g., part a) to a question. A question part may or may 
+ * Represents a part (e.g., part a) to a question. A question part may or may
  *  not have values and/or an answer.
  */
 type QuestionPart = {
@@ -20,7 +22,6 @@ type QuestionPart = {
  *  new variations to the question.
  */
 type QuestionScheme = {
-  id: ID;
   /**
    * ID of exam that this question scheme was sourced from.
    */
@@ -40,7 +41,7 @@ type QuestionScheme = {
  *  originate from a question scheme (which can be backreferenced by schemeId).
  */
 type GeneratedQuestion = {
-    schemeId: ID;
-    diagram?: string;
-    parts: QuestionPart[];
+  schemeId: ID;
+  diagram?: string;
+  parts: QuestionPart[];
 };
