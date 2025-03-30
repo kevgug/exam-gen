@@ -20,6 +20,7 @@
     "build": "tsc"
   },
   "dependencies": {
+    "@mistralai/mistralai": "^1.5.2",
     "@types/busboy": "^1.5.4",
     "@types/express": "^5.0.1",
     "@types/node-persist": "^3.1.8",
