@@ -110,7 +110,7 @@ export class ExamGenerationWorker {
         this.store.file.set(id, file);
       } catch (e) {
         console.log(
-          "pandoc not installed. skipping markdown and pdf generation...",
+          "pandoc not installed. skipping pdf generation...",
         );
         return;
       }
