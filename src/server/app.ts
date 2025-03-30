@@ -22,31 +22,14 @@ export default async (port: number) => {
 
   Object.values(store).map((s) => s.init());
 
-  const id = "a119fca6-481c-49c8-8e12-583a7f41b2a9";
+    // exam crd endpoints
+    app.post("/exam/upload", wrap(routes.exam.upload));
+    app.get("/exam/get", wrap(routes.exam.get));
+    app.get("/exam/download", wrap(routes.exam.download));
+    app.delete("/exam/delete", wrap(routes.exam.delete));
+    app.get("/exam/generate", wrap(routes.exam.generate));
 
-  const mdpath = path.join(DATA_DIR, "tmp", `${id}.md`);
-  createMd(mdpath, (await store.obj.get(id)) as Exam);
-
-  console.log("markdown file generated. converting to pdf...");
-  const file: FileMetadata = {
-    filename: `${id}.pdf`,
-    path: path.join(DATA_DIR, "file", `${id}.pdf`),
-  };
-
-  convertMdPdf(mdpath, file.path).then((process) =>
-    process.on("exit", () => unlink(mdpath)),
-  );
-  store.file.set(id, file);
-
-  console.log(id);
-  //   // exam crd endpoints
-  //   app.post("/exam/upload", wrap(routes.exam.upload));
-  //   app.get("/exam/get", wrap(routes.exam.get));
-  //   app.get("/exam/download", wrap(routes.exam.download));
-  //   app.delete("/exam/delete", wrap(routes.exam.delete));
-  //   app.get("/exam/generate", wrap(routes.exam.generate));
-
-  //   app.listen(port, () => {
-  //     console.log(`Server running at http://localhost:${port}`);
-  //   });
+    app.listen(port, () => {
+      console.log(`Server running at http://localhost:${port}`);
+    });
 };
