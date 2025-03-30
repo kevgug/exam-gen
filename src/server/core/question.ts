@@ -84,12 +84,17 @@ export class QuestionCore {
                         },
                         content: { type: "string" },
                         numMultipleChoice: { type: ["number", "null"] },
+                        multipleChoiceOptions: {
+                          type: ["array", "null"],
+                          items: { type: "string" },
+                        },
                         points: { type: "number" },
                       },
                       required: [
                         "type",
                         "content",
                         "numMultipleChoice",
+                        "multipleChoiceOptions",
                         "points",
                       ],
                       additionalProperties: false,

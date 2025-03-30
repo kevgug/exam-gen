@@ -10,6 +10,7 @@ export type QuestionNode = {
   type: "multiple-choice" | "written-response" | "numerical-response";
   content: string;
   numMultipleChoice: number | null;
+  multipleChoiceOptions: string[] | null;
   points: number;
 };
 
