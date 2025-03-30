@@ -6,7 +6,7 @@ import { Exam } from "../../shared/types/exam";
 import path from "path";
 import { unlink, writeFile } from "node:fs/promises";
 
-export const createMd = async (mdpath: string, exam: Exam) => {
+export const createMd = async (mdpath: string, exam: Exam, answer = false) => {
   let n = 0;
   const questions = exam.questionGroups
     .flatMap((group) => {
@@ -14,7 +14,7 @@ export const createMd = async (mdpath: string, exam: Exam) => {
         if ("subItems" in item) {
           return item.subItems.flatMap(collectQuestions);
         } else {
-          return [item.content];
+          return [item.content + (answer ? "\n" + item.answer : "")];
         }
       };
       return ++n + ".\n" + collectQuestions(group);
@@ -26,7 +26,7 @@ export const createMd = async (mdpath: string, exam: Exam) => {
 };
 
 export const convertMdPdf = async (mdpath: string, pdfpath: string) =>
-  spawn("pandoc", [mdpath, "-o", pdfpath]);
+  spawn("pandoc", ["--pdf-engine=lualatex", mdpath, "-o", pdfpath]);
 
 export class ExamProcessingWorker {
   store: multistore;
@@ -89,7 +89,16 @@ export class ExamGenerationWorker {
       console.log(`finished exam generation for ${id}. generating pdf...`);
 
       const mdpath = path.join(DATA_DIR, "tmp", `${id}.md`);
-      createMd(mdpath, exam);
+
+      try {
+        createMd(mdpath, exam);
+        createMd(mdpath + ".graded", exam, true);
+      } catch (e) {
+        console.log(
+          "pandoc not installed. skipping markdown and pdf generation...",
+        );
+        return;
+      }
 
       console.log("markdown file generated. converting to pdf...");
       const file: FileMetadata = {
