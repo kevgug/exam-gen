@@ -43,9 +43,9 @@ export class ComputeAnswerService {
         model: google("gemini-1.5-flash"),
         maxSteps: 5,
         maxRetries: 0,
-        prompt: `<context>${context}</context>\nConcisely write any and all valid solutions to this question for a markscheme: <question>${currQuestion.content}</question><type>${currQuestion.type}</type>.`,
+        prompt: `<context>${context}</context>\nConcisely write any and all valid solutions to this question for a markscheme: <question>${currQuestion.content}</question><type>${currQuestion.type}</type><options>${currQuestion.multipleChoiceOptions?.join(',')}</options>.`,
       });
-      console.log(steps);
+      console.log(prompt);
 
       return text;
     }
