@@ -13,9 +13,6 @@ const google = createGoogleGenerativeAI({
 });
 const codeExecutor = executeTool({
   apiKey: "X1WoDa3f9GBTdEKNTTwY5y-BH12wGGZQhswcakKHSzB8TLfKrZy2Ytn1zW9Fq8SRSbv",
-  nodeModules: {
-    axios: "0.21.1",
-  },
 });
 
 export class ComputeAnswerService {
@@ -43,26 +40,43 @@ export class ComputeAnswerService {
         model: google("gemini-1.5-flash"),
         maxSteps: 5,
         maxRetries: 0,
-        prompt: `<context>${context}</context>\nConcisely write any and all valid solutions to this question for a markscheme: <question>${currQuestion.content}</question><type>${currQuestion.type}</type>.`,
+        prompt: `<context>${context}</context>\nConcisely state the answer/s: <question>${currQuestion.content}</question><type>${currQuestion.type}</type>. State just the answer/s, nothing else.`,
       });
       console.log(steps);
 
-      return text;
+      return text.trim();
+    } else if (currQuestion.type === "numerical-response") {
+      // Call Freestyle via tool
+      const { text, steps } = await generateText({
+        // model: openai("gpt-4o"),
+        model: google("gemini-1.5-flash"),
+        tools: {
+          codeExecutor,
+        },
+        maxSteps: 5,
+        maxRetries: 0,
+        prompt: `<context>${context}</context>\nAnswer:<question>${currQuestion.content}</question><type>${currQuestion.type}</type>. State just the answer with the correct units, nothing else. Use code executor for useful computation.`,
+      });
+      console.log(steps);
+
+      return text.trim();
+    } else if (currQuestion.type === "multiple-choice") {
+      // Call Freestyle via tool
+      const { text, steps } = await generateText({
+        // model: openai("gpt-4o"),
+        model: google("gemini-1.5-flash"),
+        tools: {
+          codeExecutor,
+        },
+        maxSteps: 5,
+        maxRetries: 0,
+        prompt: `<context>${context}</context>\nAnswer:<question>${currQuestion.content}</question><choices>${currQuestion.multipleChoiceOptions}</choices>. State just the correct letter, nothing else. Use code executor for useful computation.`,
+      });
+      console.log(steps);
+
+      return text.trim();
     }
 
-    // Call Freestyle with tool
-    const { text, steps } = await generateText({
-      // model: openai("gpt-4o"),
-      model: google("gemini-1.5-flash"),
-      tools: {
-        codeExecutor,
-      },
-      maxSteps: 5,
-      maxRetries: 0,
-      prompt: `<context>${context}</context>\nUsing code executor tool, compute the answer to this STEM problem with the correct units: <question>${currQuestion.content}</question><type>${currQuestion.type}</type>.`,
-    });
-    console.log(steps);
-
-    return text;
+    return "";
   }
 }
