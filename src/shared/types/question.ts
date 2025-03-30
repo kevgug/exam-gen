@@ -1,4 +1,4 @@
-import { ID, PointWeighting, QuestionType, Unit } from "../common";
+import { ID, PointWeighting, QuestionType, Unit } from "../../server/core/common";
 
 /**
  * Represents a part (e.g., part a) to a question. A question part may or may

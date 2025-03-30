@@ -2,7 +2,7 @@ import path from "path";
 import fs from "node:fs";
 import busboy from "busboy";
 import { Request, Response } from "express";
-import { DATA_DIR, FileMetadata, multistore } from "../common";
+import { DATA_DIR, FileMetadata, multistore } from "../config";
 
 export default {
   upload: (store: multistore, req: Request, res: Response, ..._: any[]) => {
