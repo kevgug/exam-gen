@@ -90,30 +90,30 @@ export class ExamGenerationWorker {
 
       const mdpath = path.join(DATA_DIR, "tmp", `${id}.md`);
 
+      createMd(mdpath, exam);
+      createMd(mdpath + ".graded", exam, true);
+
+      console.log("markdown file generated. converting to pdf...");
       try {
-        createMd(mdpath, exam);
-        createMd(mdpath + ".graded", exam, true);
+        const file: FileMetadata = {
+          filename: `${id}.pdf`,
+          path: path.join(DATA_DIR, "file", `${id}.pdf`),
+        };
+        convertMdPdf(mdpath, file.path).then((process) =>
+          process.on("exit", async () => {
+            console.log("pdf file generated... removing markdown file...");
+            await unlink(mdpath);
+            console.log(`finished pdf generation for ${id}. exiting worker...`);
+          }),
+        );
+
+        this.store.file.set(id, file);
       } catch (e) {
         console.log(
           "pandoc not installed. skipping markdown and pdf generation...",
         );
         return;
       }
-
-      console.log("markdown file generated. converting to pdf...");
-      const file: FileMetadata = {
-        filename: `${id}.pdf`,
-        path: path.join(DATA_DIR, "file", `${id}.pdf`),
-      };
-
-      convertMdPdf(mdpath, file.path).then((process) =>
-        process.on("exit", async () => {
-          console.log("pdf file generated... removing markdown file...");
-          await unlink(mdpath);
-          console.log(`finished pdf generation for ${id}. exiting worker...`);
-        }),
-      );
-      this.store.file.set(id, file);
     });
   }
 }
