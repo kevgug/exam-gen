@@ -1,54 +1,20 @@
-import { Id, PointWeighting, Unit } from "./common";
+import { Id, PointWeighting } from "./common";
 
-export type QuestionText = string;
-export type QuestionImg = string;
+export type QuestionRoot = {
+  examId: Id;
+  pointWeighting: PointWeighting;
+  parts: (Question | QuestionWrapper)[];
+};
 
-/**
- * Represents a part (e.g., part a) to a question. A question part may or may
- *  not have values and/or an answer.
- */
-export type QuestionPart = {
-  type: QuestionType;
-  strippedContent: string;
-  variables: {
-    name: {
-      value?: number;
-      unit: Unit;
-    };
-  };
-  answer?: string | number;
+export type Question = {
+  type: "multiple-choice" | "written-response" | "numerical-response";
+  content: string;
+  children: (Question | QuestionWrapper)[];
+  numMultipleChoice: number | null;
   points: number;
 };
 
-export type QuestionChunkType = "text" | ";
-export type QuestionChunk = {
-  type: QuestionChunkType;
-  value: QuestionText | QuestionImg | QuestionPart;
-};
-
-/**
- * Represents the phrasing of a question. A question scheme is used to generate
- *  new variations to the question.
- */
-export type Question = {
-  examId: Id;
+export type QuestionWrapper = {
   content: string;
-  diagram?: string;
-  points: PointWeighting;
-  parts: QuestionChunk[];
+  children: (Question | QuestionWrapper)[];
 };
-
-/**
- * Represents an instance of a generated question. All generated questions will
- *  originate from a question scheme (which can be backreferenced by schemeId).
- */
-export type GeneratedQuestion = {
-  schemeId: Id;
-  diagram?: string;
-  parts: QuestionPart[];
-};
-
-export type QuestionType =
-  | "multiple-choice"
-  | "written-response"
-  | "numerical-response";
