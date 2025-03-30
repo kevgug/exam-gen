@@ -43,74 +43,79 @@ export class QuestionCore {
       ],
       text: {
         format: {
-          type: "json_schema",
-          name: "examSchema",
-          description:
-            "Schema for questions in a STEM exam. Each question is represented by a tree",
-          schema: {
-            type: "object",
-            properties: {
-              questions: {
-                type: "array",
-                items: {
-                  type: "object",
-                  properties: {
-                    root: {
-                      $ref: "#/$defs/Nodes",
-                    },
-                  },
-                  required: ["root"],
-                  additionalProperties: false,
-                },
-              },
-            },
-            required: ["questions"],
-            additionalProperties: false,
-            $defs: {
-              Nodes: {
-                type: "array",
-                items: {
-                  anyOf: [
-                    {
-                      type: "object",
-                      properties: {
-                        type: {
-                          type: "string",
-                          enum: [
-                            "multiple-choice",
-                            "written-response",
-                            "numerical-response",
-                          ],
-                        },
-                        content: { type: "string" },
-                        numMultipleChoice: { type: ["number", "null"] },
-                        points: { type: "number" },
-                      },
-                      required: [
-                        "type",
-                        "content",
-                        "numMultipleChoice",
-                        "points",
-                      ],
-                      additionalProperties: false,
-                    },
-                    {
-                      type: "object",
-                      properties: {
-                        content: { type: "string" },
-                        children: { $ref: "#/$defs/Nodes" },
-                      },
-                      required: ["content", "children"],
-                      additionalProperties: false,
-                    },
-                  ],
-                },
-              },
-            },
-          },
-          strict: true,
-        },
-      },
+            type: "json_object",
+        }
+      }
+      //   text: {
+      //     format: {
+      //       type: "json_schema",
+      //       name: "examSchema",
+      //       description:
+      //         "Schema for questions in a STEM exam. Each question is represented by a tree",
+      //       schema: {
+      //         type: "object",
+      //         properties: {
+      //           questions: {
+      //             type: "array",
+      //             items: {
+      //               type: "object",
+      //               properties: {
+      //                 root: {
+      //                   $ref: "#/$defs/Nodes",
+      //                 },
+      //               },
+      //               required: ["root"],
+      //               additionalProperties: false,
+      //             },
+      //           },
+      //         },
+      //         required: ["questions"],
+      //         additionalProperties: false,
+      //         $defs: {
+      //           Nodes: {
+      //             type: "array",
+      //             items: {
+      //               anyOf: [
+      //                 {
+      //                   type: "object",
+      //                   properties: {
+      //                     type: {
+      //                       type: "string",
+      //                       enum: [
+      //                         "multiple-choice",
+      //                         "written-response",
+      //                         "numerical-response",
+      //                       ],
+      //                     },
+      //                     content: { type: "string" },
+      //                     numMultipleChoice: { type: ["number", "null"] },
+      //                     points: { type: "number" },
+      //                   },
+      //                   required: [
+      //                     "type",
+      //                     "content",
+      //                     "numMultipleChoice",
+      //                     "points",
+      //                   ],
+      //                   additionalProperties: false,
+      //                 },
+      //                 {
+      //                   type: "object",
+      //                   properties: {
+      //                     content: { type: "string" },
+      //                     children: { $ref: "#/$defs/Nodes" },
+      //                   },
+      //                   required: ["content", "children"],
+      //                   additionalProperties: false,
+      //                 },
+      //               ],
+      //             },
+      //           },
+      //         },
+      //       },
+      //   strict: false,
+      // },
+      //   },
     });
 
     // Parse LLM response as json
