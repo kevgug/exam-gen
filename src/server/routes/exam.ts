@@ -3,6 +3,8 @@ import fs from "node:fs";
 import busboy from "busboy";
 import { Request, Response } from "express";
 import { DATA_DIR, FileMetadata, multistore } from "../config";
+import { ExamProcessingWorker } from "../workers";
+
 
 export default {
   upload: (store: multistore, req: Request, res: Response, ..._: any[]) => {
@@ -29,8 +31,12 @@ export default {
       await store.file.set(id, filemeta);
 
       stream.on("finish", () => {
+        // start exam processing worker
+        const worker = new ExamProcessingWorker(store);
+        worker.run();
+
         res.status(200).send({ id }).end();
-      });
+    });
     });
 
     req.pipe(bb);
