@@ -256,6 +256,7 @@ export class ExamCore {
       await this.traverse(rootGroup, async (node) => {
         if ("content" in node) {
           // type is Question
+          console.log("# previousQs:", JSON.stringify(prevQuestions));
           const answer = await ComputeAnswerService.answer({
             prevQuestions: prevQuestions,
             currQuestion: node as Question,

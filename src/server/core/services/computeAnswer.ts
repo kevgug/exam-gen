@@ -13,9 +13,6 @@ const google = createGoogleGenerativeAI({
 });
 const codeExecutor = executeTool({
   apiKey: "X1WoDa3f9GBTdEKNTTwY5y-BH12wGGZQhswcakKHSzB8TLfKrZy2Ytn1zW9Fq8SRSbv",
-  nodeModules: {
-    axios: "0.21.1",
-  },
 });
 
 export class ComputeAnswerService {
@@ -43,9 +40,9 @@ export class ComputeAnswerService {
         model: google("gemini-1.5-flash"),
         maxSteps: 5,
         maxRetries: 0,
-        prompt: `<context>${context}</context>\nConcisely write any and all valid solutions to this question for a markscheme: <question>${currQuestion.content}</question><type>${currQuestion.type}</type><options>${currQuestion.multipleChoiceOptions?.join(',')}</options>.`,
+        prompt: `<context>${context}</context>\nConcisely state the answer/s: <question>${currQuestion.content}</question><type>${currQuestion.type}</type>. State just the answer/s, nothing else.`,
       });
-      console.log(prompt);
+      console.log(steps);
 
       return text;
     }
@@ -63,6 +60,9 @@ export class ComputeAnswerService {
     });
     console.log(steps);
 
-    return text;
+      return text.trim();
+    }
+
+    return "";
   }
 }
