@@ -177,92 +177,58 @@ export class ExamCore {
         format: {
           type: "json_schema",
           name: "examSchema",
-          description:
-            "Schema for a STEM exam. Each exam question is represented by a tree",
+          description: "Schema for a STEM exam",
           schema: {
             type: "object",
             properties: {
-              questions: {
-                type: "array",
-                items: { $ref: "#/$defs/QuestionTree" },
-              },
-              metadata: {
-                type: "object",
-                properties: {
-                  numQuestions: { type: "number" },
-                  weighting: { $ref: "#/$defs/PointWeighting" },
-                },
-                required: ["numQuestions", "weighting"],
-                additionalProperties: false,
+              questionGroups: {
+                $ref: "#/$defs/NodeList",
               },
             },
-            required: ["questions", "metadata"],
+            required: ["questionGroups"],
             additionalProperties: false,
             $defs: {
-              PointWeighting: {
-                type: "object",
-                properties: {
-                  "multiple-choice": { type: "number" },
-                  "numerical-response": { type: "number" },
-                  "freeform-response": { type: "number" },
+              NodeList: {
+                type: "array",
+                items: {
+                  anyOf: [
+                    {
+                      type: "object",
+                      properties: {
+                        type: {
+                          type: "string",
+                          enum: [
+                            "multiple-choice",
+                            "freeform-response",
+                            "numerical-response",
+                          ],
+                        },
+                        content: { type: "string" },
+                        multipleChoiceOptions: {
+                          type: ["array", "null"],
+                          items: { type: "string" },
+                        },
+                        points: { type: "number" },
+                      },
+                      required: [
+                        "type",
+                        "content",
+                        "multipleChoiceOptions",
+                        "points",
+                      ],
+                      additionalProperties: false,
+                    },
+                    {
+                      type: "object",
+                      properties: {
+                        content: { type: "string" },
+                        subItems: { $ref: "#/$defs/NodeList" },
+                      },
+                      required: ["content", "subItems"],
+                      additionalProperties: false,
+                    },
+                  ],
                 },
-                required: [
-                  "multiple-choice",
-                  "numerical-response",
-                  "freeform-response",
-                ],
-                additionalProperties: false,
-              },
-              QuestionTree: {
-                anyOf: [
-                  { $ref: "#/$defs/QuestionNode" },
-                  { $ref: "#/$defs/QuestionWrapper" },
-                ],
-              },
-              QuestionNode: {
-                type: "object",
-                properties: {
-                  type: {
-                    type: "string",
-                    enum: [
-                      "multiple-choice",
-                      "freeform-response",
-                      "numerical-response",
-                    ],
-                  },
-                  content: { type: "string" },
-                  numMultipleChoice: { type: ["number", "null"] },
-                  multipleChoiceOptions: {
-                    type: ["array", "null"],
-                    items: { type: "string" },
-                  },
-                  points: { type: "number" },
-                  children: {
-                    type: "array",
-                    items: { $ref: "#/$defs/QuestionTree" },
-                  },
-                },
-                required: [
-                  "type",
-                  "content",
-                  "numMultipleChoice",
-                  "multipleChoiceOptions",
-                  "points",
-                  "children",
-                ],
-                additionalProperties: false,
-              },
-              QuestionWrapper: {
-                type: "object",
-                properties: {
-                  content: { type: "string" },
-                  children: {
-                    type: "array",
-                    items: { $ref: "#/$defs/QuestionTree" },
-                  },
-                },
-                required: ["content", "children"],
-                additionalProperties: false,
               },
             },
           },
