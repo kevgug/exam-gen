@@ -8,7 +8,6 @@ export type Question = {
 };
 
 export type QuestionGroup = {
-  content: string; // could be a parent question or context
-  nextQuestionIndex: string | number; // 1,2,3 vs a,b,c vs i,ii,iii
+  groupContent: string; // could be a parent question or context
   subItems: (Question | QuestionGroup)[];
 };

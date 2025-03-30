@@ -22,24 +22,26 @@ export class ExamCore {
   };
 
   public static async getFromMarkdown(mdStr: string): Promise<Exam> {
-    const cleanMd = await openai.responses
-      .create({
-        model: "chatgpt-4o-latest",
-        input: [
-          {
-            role: "system",
-            content:
-              "Remove artifacts from OCR as well as any page references or references to continued questions or physical pages. Output just the md, nothing else.",
-          },
-          {
-            role: "user",
-            content: mdStr,
-          },
-        ],
-      })
-      .then((response) => response.output_text);
+    // const cleanMd = await openai.responses
+    //   .create({
+    //     model: "chatgpt-4o-latest",
+    //     input: [
+    //       {
+    //         role: "system",
+    //         content:
+    //           "Remove artifacts from OCR as well as any page references or references to continued questions or physical pages. Output just the md, nothing else.",
+    //       },
+    //       {
+    //         role: "user",
+    //         content: mdStr,
+    //       },
+    //     ],
+    //   })
+    //   .then((response) => response.output_text);
 
-    console.log(cleanMd);
+    // console.log(cleanMd);
+
+    const cleanMd = mdStr;
 
     // Invoke LLM
     const response = await openai.responses.create({
@@ -48,7 +50,7 @@ export class ExamCore {
         {
           role: "system",
           content:
-            "You are STEM teacher. Convert the markdown exam into structured JSON. Going from a question number to question letter (a) means introducing a new question subgroup, as does going from a question letter to roman numeral (i), and so on. Question types are: multiple choice, numerical response (question asking for computation), and freeform response (question asking for explanation or reciting knowledge). For each multiple choice question, put the number of multiple choice choice options in the optional `numMultipleChoice` field. You MUST include all questions from the md.",
+            "You are STEM teacher. Convert the markdown exam into structured JSON. Going from a question number to question letter (a) means introducing a new question subgroup, as does going from a question letter to roman numeral (i), and so on. You must include the relevant question letter and roman numerals at the start of `content`, but never inside `contentGroup`. Question types are: multiple choice, numerical response (question asking for computation), and freeform response (question asking for explanation or reciting knowledge). For each multiple choice question, put the number of multiple choice choice options in the optional `numMultipleChoice` field. You MUST include all questions from the md.",
         },
         {
           role: "user",
@@ -103,10 +105,10 @@ export class ExamCore {
                     {
                       type: "object",
                       properties: {
-                        content: { type: "string" },
+                        groupContent: { type: "string" },
                         subItems: { $ref: "#/$defs/NodeList" },
                       },
-                      required: ["content", "subItems"],
+                      required: ["groupContent", "subItems"],
                       additionalProperties: false,
                     },
                   ],
@@ -221,10 +223,10 @@ export class ExamCore {
                     {
                       type: "object",
                       properties: {
-                        content: { type: "string" },
+                        groupContent: { type: "string" },
                         subItems: { $ref: "#/$defs/NodeList" },
                       },
-                      required: ["content", "subItems"],
+                      required: ["groupContent", "subItems"],
                       additionalProperties: false,
                     },
                   ],
