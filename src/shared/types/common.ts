@@ -1,13 +1,10 @@
-import { QuestionType } from "./question";
-
-export type ID = string;
-export type Unit = string; // TODO: could be more careful and make an enumeration
+export type Id = string;
 
 /**
  * Represents a normalized point distribution between the different types of questions.
  */
 export type PointWeighting = {
-  [QuestionType.MULTIPLE_CHOICE]: number;
-  [QuestionType.NUMERICAL_RESPONSE]: number;
-  [QuestionType.WRITTEN_RESPONSE]: number;
+  "multiple-choice": number;
+  "numerical-response": number;
+  "written-response": number;
 };

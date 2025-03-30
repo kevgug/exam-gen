@@ -20,12 +20,15 @@
     "build": "tsc"
   },
   "dependencies": {
+    "@mistralai/mistralai": "^1.5.2",
     "@types/busboy": "^1.5.4",
     "@types/express": "^5.0.1",
     "@types/node-persist": "^3.1.8",
     "busboy": "^1.6.0",
+    "dotenv": "^16.4.7",
     "express": "^4.21.2",
-    "node-persist": "^4.0.4"
+    "node-persist": "^4.0.4",
+    "openai": "^4.90.0"
   },
   "devDependencies": {
     "@types/node": "^22.13.14",
