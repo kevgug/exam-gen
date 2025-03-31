@@ -1,7 +1,7 @@
 import PdfPrinter from "pdfmake";
 import * as fs from "node:fs";
 import { Exam } from "../../../shared/types/exam";
-import { TDocumentDefinitions } from "pdfmake/interfaces";
+import { ContentTable, TDocumentDefinitions } from "pdfmake/interfaces";
 
 export type ExamOptions = {
   includeAnswers: boolean;
@@ -54,9 +54,52 @@ export class PDFService {
     console.log("path:", path);
     const docDefinition: TDocumentDefinitions = {
       content: [
-        "First paragraph",
-        "Another paragraph, this time a little bit longer to make sure, this line will be divided into at least two lines",
+        // Properly typed column structure
+        {
+          columns: [
+            {
+              width: "auto",
+              text: "(a)",
+              bold: true,
+              alignment: "left",
+            },
+            {
+              width: "*",
+              text: [
+                "This is multiline text that wraps onto the next few lines. Lorem ipsum dolor ipsumao dolor ipsum dolor ipsum dolor ipsum dolor.",
+              ],
+              margin: [16, 0, 16, 0],
+              lineHeight: 1.5,
+            },
+            {
+              width: "auto",
+              text: "[2]",
+              alignment: "right",
+            },
+          ],
+        },
+
+        // Properly typed table structure
+        {
+          margin: [0, 5, 0, 15],
+          table: {
+            widths: ["*"],
+            heights: [100],
+            body: [[{ text: "" }]],
+          },
+          layout: {
+            hLineWidth: function () {
+              return 1;
+            },
+            vLineWidth: function () {
+              return 1;
+            },
+          },
+        } as ContentTable,
       ],
+      // defaultStyle: {
+      //   font: "Helvetica",
+      // },
     };
 
     var pdfDoc = printer.createPdfKitDocument(docDefinition);
