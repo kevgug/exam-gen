@@ -12,7 +12,7 @@ const google = createGoogleGenerativeAI({
   apiKey: process.env.GEMINI_API_KEY,
 });
 const codeExecutor = executeTool({
-  apiKey: "X1WoDa3f9GBTdEKNTTwY5y-BH12wGGZQhswcakKHSzB8TLfKrZy2Ytn1zW9Fq8SRSbv",
+  apiKey: process.env.FREESTYLE_API_KEY ?? "",
 });
 
 export class ComputeAnswerService {
