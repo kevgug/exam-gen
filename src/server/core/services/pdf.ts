@@ -22,6 +22,9 @@ type FontWeight =
   | "Black";
 type FontOptions = { isItalic: boolean };
 
+const INDENT_SIZE = 30;
+const V_MARGIN = 15;
+
 export class PDFService {
   public static async renderExam(
     path: string,
@@ -57,28 +60,63 @@ export class PDFService {
         {
           columns: [
             {
-              width: 35,
-              text: "42.",
+              width: INDENT_SIZE,
+              text: "1.",
               bold: true,
               alignment: "left",
             },
             {
               width: "*",
               text: [
-                "This is multiline text that wraps onto the next few lines. x x x x x x x x x x x x x x x x x x x",
+                "A ball of mass 0.800 kg is attached to a string. The distance to the centre of the mass of the ball from the point of support is 95.0 cm. The ball is released from rest when the string is horizontal. When the string becomes vertical the ball collides with a block of mass 2.40 kg that is at rest on a horizontal surface.",
               ],
-              lineHeight: 1.5,
+              lineHeight: 1.15,
+            },
+          ],
+          marginLeft: 0,
+          marginTop: 0,
+        },
+        {
+          columns: [
+            {
+              width: INDENT_SIZE,
+              text: "(a)",
+              bold: false,
+              alignment: "left",
+            },
+            {
+              width: "*",
+              text: ["Just before the collision of the ball with the block,"],
+              lineHeight: 1.15,
+            },
+          ],
+          marginLeft: INDENT_SIZE,
+          marginTop: V_MARGIN,
+        },
+        {
+          columns: [
+            {
+              width: INDENT_SIZE,
+              text: "(i)",
+              bold: false,
+              alignment: "left",
+            },
+            {
+              width: "*",
+              text: ["draw a free-body diagram for the ball."],
+              lineHeight: 1.15,
             },
             {
               width: "auto",
               text: "[2]",
-              margin: [25, 0, 0, 0],
+              marginLeft: 25,
               alignment: "right",
             },
           ],
+          marginLeft: INDENT_SIZE * 2,
+          marginTop: V_MARGIN,
         },
         {
-          margin: [0, 5, 0, 15],
           table: {
             widths: ["*"],
             heights: [100],
@@ -92,6 +130,7 @@ export class PDFService {
               return 1;
             },
           },
+          marginTop: 10,
         } as ContentTable,
       ],
       // defaultStyle: {
