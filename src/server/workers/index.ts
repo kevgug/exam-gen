@@ -1,32 +1,9 @@
-import { fork, spawn } from "node:child_process";
+import { fork } from "node:child_process";
 import { DATA_DIR, FileMetadata, multistore } from "../config";
 import { Id } from "../../shared/types/common";
-import { Question, QuestionGroup } from "../../shared/types/question";
 import { Exam } from "../../shared/types/exam";
 import path from "path";
-import { unlink, writeFile } from "node:fs/promises";
-
-export const createMd = async (mdpath: string, exam: Exam, answer = false) => {
-  let n = 0;
-  const questions = exam.questionGroups
-    .flatMap((group) => {
-      const collectQuestions = (item: Question | QuestionGroup): string[] => {
-        if ("subItems" in item) {
-          return item.subItems.flatMap(collectQuestions);
-        } else {
-          return [item.content + (answer ? "\n" + item.answer : "")];
-        }
-      };
-      return ++n + ".\n" + collectQuestions(group);
-    })
-    .join("\n\n");
-
-  const markdownContent = `# Exam Questions\n\n${questions}`;
-  writeFile(mdpath, markdownContent);
-};
-
-export const convertMdPdf = async (mdpath: string, pdfpath: string) =>
-  spawn("pandoc", ["--pdf-engine=lualatex", mdpath, "-o", pdfpath]);
+import { PDFService } from "../core/services/pdf";
 
 export class ExamProcessingWorker {
   store: multistore;
@@ -80,7 +57,7 @@ export class ExamGenerationWorker {
       ),
     );
 
-    process.on("message", (message, _) => {
+    process.on("message", async (message, _) => {
       const exam: Exam = JSON.parse(message.toString()) as Exam;
 
       exam.generated = true;
@@ -88,30 +65,15 @@ export class ExamGenerationWorker {
 
       console.log(`finished exam generation for ${id}. generating pdf...`);
 
-      const mdpath = path.join(DATA_DIR, "tmp", `${id}.md`);
-
-      createMd(mdpath, exam);
-      createMd(mdpath + ".graded", exam, true);
-
-      console.log("markdown file generated. converting to pdf...");
+      const pdfFileMetadata: FileMetadata = {
+        filename: `${id}.pdf`,
+        path: path.join(DATA_DIR, "file", `${id}.pdf`),
+      };
       try {
-        const file: FileMetadata = {
-          filename: `${id}.pdf`,
-          path: path.join(DATA_DIR, "file", `${id}.pdf`),
-        };
-        convertMdPdf(mdpath, file.path).then((process) =>
-          process.on("exit", async () => {
-            console.log("pdf file generated... removing markdown file...");
-            // await unlink(mdpath);
-            console.log(`finished pdf generation for ${id}. exiting worker...`);
-          }),
-        ).catch(console.error);
-
-        this.store.file.set(id, file);
+        await PDFService.renderExam(pdfFileMetadata.path, exam);
+        this.store.file.set(id, pdfFileMetadata);
       } catch (e) {
-        console.log(
-          "pandoc not installed. skipping pdf generation...",
-        );
+        console.log(`failed to render exam: ${e}`);
         return;
       }
     });
