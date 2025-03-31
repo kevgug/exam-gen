@@ -54,32 +54,29 @@ export class PDFService {
     console.log("path:", path);
     const docDefinition: TDocumentDefinitions = {
       content: [
-        // Properly typed column structure
         {
           columns: [
             {
-              width: "auto",
-              text: "(a)",
+              width: 35,
+              text: "42.",
               bold: true,
               alignment: "left",
             },
             {
               width: "*",
               text: [
-                "This is multiline text that wraps onto the next few lines. Lorem ipsum dolor ipsumao dolor ipsum dolor ipsum dolor ipsum dolor.",
+                "This is multiline text that wraps onto the next few lines. x x x x x x x x x x x x x x x x x x x",
               ],
-              margin: [16, 0, 16, 0],
               lineHeight: 1.5,
             },
             {
               width: "auto",
               text: "[2]",
+              margin: [25, 0, 0, 0],
               alignment: "right",
             },
           ],
         },
-
-        // Properly typed table structure
         {
           margin: [0, 5, 0, 15],
           table: {
