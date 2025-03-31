@@ -24,6 +24,7 @@ type FontOptions = { isItalic: boolean };
 
 const INDENT_SIZE = 30;
 const V_MARGIN = 15;
+const TEXT_LINE_HEIGHT = 25;
 
 export class PDFService {
   public static async renderExam(
@@ -119,8 +120,68 @@ export class PDFService {
         {
           table: {
             widths: ["*"],
-            heights: [100],
-            body: [[{ text: "" }]],
+            heights: ["auto"],
+            body: [
+              [
+                {
+                  stack: [
+                    { text: "", marginTop: TEXT_LINE_HEIGHT },
+                    {
+                      canvas: [
+                        {
+                          type: "line",
+                          x1: TEXT_LINE_HEIGHT,
+                          y1: 0,
+                          x2: 510 - TEXT_LINE_HEIGHT,
+                          y2: 0,
+                          dash: { length: 2, space: 5 },
+                        },
+                      ],
+                    },
+                    { text: "", marginTop: TEXT_LINE_HEIGHT },
+                    {
+                      canvas: [
+                        {
+                          type: "line",
+                          x1: TEXT_LINE_HEIGHT,
+                          y1: 0,
+                          x2: 510 - TEXT_LINE_HEIGHT,
+                          y2: 0,
+                          dash: { length: 2, space: 5 },
+                        },
+                      ],
+                    },
+                    { text: "", marginTop: TEXT_LINE_HEIGHT },
+                    {
+                      canvas: [
+                        {
+                          type: "line",
+                          x1: TEXT_LINE_HEIGHT,
+                          y1: 0,
+                          x2: 510 - TEXT_LINE_HEIGHT,
+                          y2: 0,
+                          dash: { length: 2, space: 5 },
+                        },
+                      ],
+                    },
+                    { text: "", marginTop: TEXT_LINE_HEIGHT },
+                    {
+                      canvas: [
+                        {
+                          type: "line",
+                          x1: TEXT_LINE_HEIGHT,
+                          y1: 0,
+                          x2: 510 - TEXT_LINE_HEIGHT,
+                          y2: 0,
+                          dash: { length: 2, space: 5 },
+                        },
+                      ],
+                    },
+                    { text: "", marginTop: TEXT_LINE_HEIGHT },
+                  ],
+                },
+              ],
+            ],
           },
           layout: {
             hLineWidth: function () {
@@ -133,9 +194,6 @@ export class PDFService {
           marginTop: 10,
         } as ContentTable,
       ],
-      // defaultStyle: {
-      //   font: "Helvetica",
-      // },
     };
 
     var pdfDoc = printer.createPdfKitDocument(docDefinition);
