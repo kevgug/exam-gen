@@ -2,13 +2,27 @@ import PdfPrinter from "pdfmake";
 import * as fs from "node:fs";
 import { Exam } from "../../../shared/types/exam";
 import { ContentTable, TDocumentDefinitions } from "pdfmake/interfaces";
+import { QuestionGroup } from "../../../shared/types/question";
 
 export type ExamOptions = {
   includeAnswers: boolean;
 };
 
 const MAX_QUESTION_DEPTH = 5; // (1)(a)(i)(A)(I)
-const TAB_SIZE = 4;
+
+const alphabet = "abcdefghijklmnopqrstuvwxyz".split("");
+const romanNumerals = [
+  "i",
+  "ii",
+  "iii",
+  "iv",
+  "v",
+  "vi",
+  "vii",
+  "viii",
+  "ix",
+  "x",
+];
 
 type FontWeight =
   | "Thin"
@@ -54,10 +68,174 @@ export class PDFService {
         bolditalics: fontFilePath("Bold", { isItalic: true }),
       },
     };
-    const printer = new PdfPrinter(fonts);
-    console.log("path:", path);
+
+    const renderQuestionNum = ({
+      questionNumIdx,
+      depth,
+    }: {
+      depth: number;
+      questionNumIdx: number;
+    }): string => {
+      switch (depth) {
+        case 0:
+          return `${questionNumIdx + 1}.`;
+        case 1:
+          return `(${alphabet.at(questionNumIdx) ?? ""})`;
+        case 2:
+          return `(${romanNumerals.at(questionNumIdx) ?? ""})`;
+        case 3:
+          return `(${alphabet.at(questionNumIdx)?.toUpperCase() ?? ""})`;
+        case 4:
+          return `(${romanNumerals.at(questionNumIdx)?.toUpperCase() ?? ""})`;
+        default:
+          return "";
+      }
+    };
+
+    const questionGroup = ({
+      depth,
+      questionNumIdx,
+      content,
+      options = { isFirst: false },
+    }: {
+      depth: number;
+      questionNumIdx: number;
+      content: string;
+      options?: { isFirst: boolean };
+    }): TDocumentDefinitions["content"] => {
+      return {
+        columns: [
+          {
+            width: INDENT_SIZE,
+            text: renderQuestionNum({ questionNumIdx, depth }),
+            bold: depth === 0,
+            alignment: "left",
+          },
+          {
+            width: "*",
+            text: [content],
+            lineHeight: 1.15,
+          },
+        ],
+        marginLeft: INDENT_SIZE * depth,
+        marginTop: options.isFirst ? 0 : V_MARGIN,
+      };
+    };
+
+    const answerBox = ({ numLines }: { numLines: number }): ContentTable => {
+      const singleLine = [
+        { text: "", marginTop: TEXT_LINE_HEIGHT },
+        {
+          canvas: [
+            {
+              type: "line",
+              x1: TEXT_LINE_HEIGHT,
+              y1: 0,
+              x2: 510 - TEXT_LINE_HEIGHT,
+              y2: 0,
+              dash: { length: 2, space: 5 },
+            },
+          ],
+        },
+      ];
+
+      return {
+        table: {
+          widths: ["*"],
+          heights: ["auto"],
+          body: [
+            [
+              {
+                stack: [
+                  ...Array.from({ length: numLines }, () =>
+                    JSON.parse(JSON.stringify(singleLine)),
+                  ).flat(),
+                  { text: "", marginTop: TEXT_LINE_HEIGHT },
+                ],
+              },
+            ],
+          ],
+        },
+        layout: {
+          hLineWidth: function () {
+            return 1;
+          },
+          vLineWidth: function () {
+            return 1;
+          },
+        },
+        marginTop: 10,
+      };
+    };
+
+    const writtenQuestion = ({
+      depth,
+      questionNumIdx,
+      content,
+      pointsAvailable,
+      options = { showPointsAvailable: true, isFirst: false },
+    }: {
+      depth: number;
+      questionNumIdx: number;
+      content: string;
+      pointsAvailable: number;
+      options?: { showPointsAvailable: boolean; isFirst: boolean };
+    }): TDocumentDefinitions["content"] => {
+      return {
+        stack: [
+          {
+            columns: [
+              {
+                width: INDENT_SIZE,
+                text: renderQuestionNum({ questionNumIdx, depth }),
+                bold: depth === 0,
+                alignment: "left",
+              },
+              {
+                width: "*",
+                text: [content],
+                lineHeight: 1.15,
+              },
+              {
+                width: "auto",
+                text: `[${pointsAvailable}]`,
+                marginLeft: 25,
+                alignment: "right",
+              },
+            ],
+            marginLeft: INDENT_SIZE * depth,
+            marginTop: options.isFirst ? 0 : V_MARGIN,
+          },
+          answerBox({ numLines: pointsAvailable * 2 }),
+        ],
+      };
+    };
+
     const docDefinition: TDocumentDefinitions = {
       content: [
+        questionGroup({
+          depth: 0,
+          questionNumIdx: 0,
+          content: "question group 1",
+        }),
+        questionGroup({
+          depth: 1,
+          questionNumIdx: 0,
+          content: "question group 2",
+        }),
+        writtenQuestion({
+          depth: 2,
+          questionNumIdx: 0,
+          content: "question 1",
+          pointsAvailable: 2,
+        }),
+        writtenQuestion({
+          depth: 2,
+          questionNumIdx: 1,
+          content: "question 2",
+          pointsAvailable: 3,
+        }),
+
         // Question group: 1.
         {
           columns: [
@@ -96,6 +274,7 @@ export class PDFService {
           marginLeft: INDENT_SIZE,
           marginTop: V_MARGIN,
         },
+
         // Question: (i)
         {
           columns: [
@@ -225,77 +404,82 @@ export class PDFService {
         },
         // Multiple choice options: 1
         {
-          columns: [
+          stack: [
             {
-              width: INDENT_SIZE,
-              text: "A.",
-              bold: false,
-              alignment: "left",
+              columns: [
+                {
+                  width: INDENT_SIZE,
+                  text: "A.",
+                  bold: false,
+                  alignment: "left",
+                },
+                {
+                  width: "*",
+                  text: ["1 N and 2 N"],
+                  lineHeight: 1.15,
+                },
+              ],
+              marginLeft: INDENT_SIZE,
+              marginTop: V_MARGIN,
             },
             {
-              width: "*",
-              text: ["1 N and 2 N"],
-              lineHeight: 1.15,
+              columns: [
+                {
+                  width: INDENT_SIZE,
+                  text: "B.",
+                  bold: false,
+                  alignment: "left",
+                },
+                {
+                  width: "*",
+                  text: ["1 N and 14 N"],
+                  lineHeight: 1.15,
+                },
+              ],
+              marginLeft: INDENT_SIZE,
+              marginTop: V_MARGIN,
+            },
+            {
+              columns: [
+                {
+                  width: INDENT_SIZE,
+                  text: "C.",
+                  bold: false,
+                  alignment: "left",
+                },
+                {
+                  width: "*",
+                  text: ["5 N and 6 N"],
+                  lineHeight: 1.15,
+                },
+              ],
+              marginLeft: INDENT_SIZE,
+              marginTop: V_MARGIN,
+            },
+            {
+              columns: [
+                {
+                  width: INDENT_SIZE,
+                  text: "D.",
+                  bold: false,
+                  alignment: "left",
+                },
+                {
+                  width: "*",
+                  text: ["6 N and 7 N"],
+                  lineHeight: 1.15,
+                },
+              ],
+              marginLeft: INDENT_SIZE,
+              marginTop: V_MARGIN,
             },
           ],
-          marginLeft: INDENT_SIZE,
-          marginTop: V_MARGIN,
-        },
-        {
-          columns: [
-            {
-              width: INDENT_SIZE,
-              text: "B.",
-              bold: false,
-              alignment: "left",
-            },
-            {
-              width: "*",
-              text: ["1 N and 14 N"],
-              lineHeight: 1.15,
-            },
-          ],
-          marginLeft: INDENT_SIZE,
-          marginTop: V_MARGIN,
-        },
-        {
-          columns: [
-            {
-              width: INDENT_SIZE,
-              text: "C.",
-              bold: false,
-              alignment: "left",
-            },
-            {
-              width: "*",
-              text: ["5 N and 6 N"],
-              lineHeight: 1.15,
-            },
-          ],
-          marginLeft: INDENT_SIZE,
-          marginTop: V_MARGIN,
-        },
-        {
-          columns: [
-            {
-              width: INDENT_SIZE,
-              text: "D.",
-              bold: false,
-              alignment: "left",
-            },
-            {
-              width: "*",
-              text: ["6 N and 7 N"],
-              lineHeight: 1.15,
-            },
-          ],
-          marginLeft: INDENT_SIZE,
-          marginTop: V_MARGIN,
         },
       ],
     };
 
-    var pdfDoc = printer.createPdfKitDocument(docDefinition);
+    const printer = new PdfPrinter(fonts);
+    const pdfDoc = printer.createPdfKitDocument(docDefinition);
     pdfDoc.pipe(fs.createWriteStream(path));
     pdfDoc.end();
     return;
