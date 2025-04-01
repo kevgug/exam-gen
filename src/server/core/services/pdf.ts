@@ -42,6 +42,7 @@ type FontOptions = { isItalic: boolean };
 
 const INDENT_SIZE = 30;
 const V_MARGIN = 15;
+const V_NEW_QUESTION = 15;
 const TEXT_LINE_HEIGHT = 25;
 
 export class PDFService {
@@ -117,12 +118,14 @@ export class PDFService {
           },
           {
             width: "*",
-            text: [content],
+            text: content,
             lineHeight: 1.15,
           },
         ],
         marginLeft: INDENT_SIZE * depth,
-        marginTop: options.isFirst ? 0 : V_MARGIN,
+        marginTop: options.isFirst
+          ? 0
+          : V_MARGIN + (depth === 0 ? V_NEW_QUESTION : 0),
       };
     };
     const answerBox = ({ numLines }: { numLines: number }): ContentTable => {
@@ -173,14 +176,21 @@ export class PDFService {
       questionNumIdx,
       content,
       pointsAvailable,
-      options = { showPointsAvailable: true, isFirst: false },
+      options,
     }: {
       depth: number;
       questionNumIdx: number;
       content: string;
       pointsAvailable: number;
-      options?: { showPointsAvailable: boolean; isFirst: boolean };
+      options?: { showPointsAvailable?: boolean; isFirst?: boolean };
     }): Content => {
+      // Set defaults for options
+      options = {
+        showPointsAvailable: true,
+        isFirst: false,
+        ...options,
+      };
+
       return {
         stack: [
           {
@@ -193,18 +203,22 @@ export class PDFService {
               },
               {
                 width: "*",
-                text: [content],
+                text: content,
                 lineHeight: 1.15,
               },
-              {
-                width: "auto",
-                text: `[${pointsAvailable}]`,
-                marginLeft: 25,
-                alignment: "right",
-              },
+              options.showPointsAvailable
+                ? {
+                    width: "auto",
+                    text: `[${pointsAvailable}]`,
+                    marginLeft: 25,
+                    alignment: "right",
+                  }
+                : { text: "" },
             ],
             marginLeft: INDENT_SIZE * depth,
-            marginTop: options.isFirst ? 0 : V_MARGIN,
+            marginTop: options.isFirst
+              ? 0
+              : V_MARGIN + (depth === 0 ? V_NEW_QUESTION : 0),
           },
           answerBox({ numLines: pointsAvailable * 2 }),
         ],
@@ -216,15 +230,22 @@ export class PDFService {
       content,
       choices,
       pointsAvailable,
-      options = { showPointsAvailable: true, isFirst: false },
+      options,
     }: {
       depth: number;
       questionNumIdx: number;
       content: string;
       choices: string[];
       pointsAvailable: number;
-      options?: { showPointsAvailable: boolean; isFirst: boolean };
+      options?: { showPointsAvailable?: boolean; isFirst?: boolean };
     }): Content => {
+      // Set defaults for options
+      options = {
+        showPointsAvailable: true,
+        isFirst: false,
+        ...options,
+      };
+
       const singleChoice = ({
         content,
         idx,
@@ -242,7 +263,7 @@ export class PDFService {
             },
             {
               width: "*",
-              text: [content],
+              text: content,
               lineHeight: 1.15,
             },
           ],
@@ -262,18 +283,22 @@ export class PDFService {
               },
               {
                 width: "*",
-                text: [content],
+                text: content,
                 lineHeight: 1.15,
               },
-              {
-                width: "auto",
-                text: `[${pointsAvailable}]`,
-                marginLeft: 25,
-                alignment: "right",
-              },
+              options.showPointsAvailable
+                ? {
+                    width: "auto",
+                    text: `[${pointsAvailable}]`,
+                    marginLeft: 25,
+                    alignment: "right",
+                  }
+                : { text: "" },
             ],
             marginLeft: INDENT_SIZE * depth,
-            marginTop: options.isFirst ? 0 : V_MARGIN,
+            marginTop: options.isFirst
+              ? 0
+              : V_MARGIN + (depth === 0 ? V_NEW_QUESTION : 0),
           },
           {
             marginLeft: INDENT_SIZE * (depth + 1),
@@ -291,6 +316,9 @@ export class PDFService {
           depth: 0,
           questionNumIdx: 0,
           content: "question group 1",
+          options: {
+            isFirst: true,
+          },
         }),
         questionGroup({
           depth: 1,
@@ -311,10 +339,23 @@ export class PDFService {
         }),
         multipleChoiceQuestion({
           depth: 0,
-          questionNumIdx: 0,
-          content: "question 1",
+          questionNumIdx: 1,
+          content: "question 2",
           choices: ["one", "two", "three"],
           pointsAvailable: 1,
+          options: {
+            showPointsAvailable: false,
+          },
+        }),
+        multipleChoiceQuestion({
+          depth: 0,
+          questionNumIdx: 2,
+          content: "question 3",
+          choices: ["one", "two", "three", "four"],
+          pointsAvailable: 1,
+          options: {
+            showPointsAvailable: false,
+          },
         }),
       ],
     };
