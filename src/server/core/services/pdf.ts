@@ -58,6 +58,7 @@ export class PDFService {
     console.log("path:", path);
     const docDefinition: TDocumentDefinitions = {
       content: [
+        // Question group: 1.
         {
           columns: [
             {
@@ -77,6 +78,7 @@ export class PDFService {
           marginLeft: 0,
           marginTop: 0,
         },
+        // Question group: (a)
         {
           columns: [
             {
@@ -94,6 +96,7 @@ export class PDFService {
           marginLeft: INDENT_SIZE,
           marginTop: V_MARGIN,
         },
+        // Question: (i)
         {
           columns: [
             {
@@ -117,6 +120,7 @@ export class PDFService {
           marginLeft: INDENT_SIZE * 2,
           marginTop: V_MARGIN,
         },
+        // Answer box: (i)
         {
           table: {
             widths: ["*"],
@@ -193,6 +197,101 @@ export class PDFService {
           },
           marginTop: 10,
         } as ContentTable,
+        // Multiple choice question: 1
+        {
+          columns: [
+            {
+              width: INDENT_SIZE,
+              text: "2.",
+              bold: true,
+              alignment: "left",
+            },
+            {
+              width: "*",
+              text: [
+                "The magnitude of the resultant of two forces acting on a body is 12 N. Which pair of forces acting on the body can combine to produce this resultant?",
+              ],
+              lineHeight: 1.15,
+            },
+            // {
+            //   width: "auto",
+            //   text: "[1]",
+            //   marginLeft: 25,
+            //   alignment: "right",
+            // },
+          ],
+          marginLeft: 0,
+          marginTop: 2 * V_MARGIN,
+        },
+        // Multiple choice options: 1
+        {
+          columns: [
+            {
+              width: INDENT_SIZE,
+              text: "A.",
+              bold: false,
+              alignment: "left",
+            },
+            {
+              width: "*",
+              text: ["1 N and 2 N"],
+              lineHeight: 1.15,
+            },
+          ],
+          marginLeft: INDENT_SIZE,
+          marginTop: V_MARGIN,
+        },
+        {
+          columns: [
+            {
+              width: INDENT_SIZE,
+              text: "B.",
+              bold: false,
+              alignment: "left",
+            },
+            {
+              width: "*",
+              text: ["1 N and 14 N"],
+              lineHeight: 1.15,
+            },
+          ],
+          marginLeft: INDENT_SIZE,
+          marginTop: V_MARGIN,
+        },
+        {
+          columns: [
+            {
+              width: INDENT_SIZE,
+              text: "C.",
+              bold: false,
+              alignment: "left",
+            },
+            {
+              width: "*",
+              text: ["5 N and 6 N"],
+              lineHeight: 1.15,
+            },
+          ],
+          marginLeft: INDENT_SIZE,
+          marginTop: V_MARGIN,
+        },
+        {
+          columns: [
+            {
+              width: INDENT_SIZE,
+              text: "D.",
+              bold: false,
+              alignment: "left",
+            },
+            {
+              width: "*",
+              text: ["6 N and 7 N"],
+              lineHeight: 1.15,
+            },
+          ],
+          marginLeft: INDENT_SIZE,
+          marginTop: V_MARGIN,
+        },
       ],
     };
 
