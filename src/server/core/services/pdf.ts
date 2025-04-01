@@ -49,9 +49,9 @@ export class PDFService {
     const fonts = {
       Roboto: {
         normal: fontFilePath("Regular"),
-        bold: fontFilePath("Medium"),
+        bold: fontFilePath("Bold"),
         italics: fontFilePath("Regular", { isItalic: true }),
-        bolditalics: fontFilePath("Medium", { isItalic: true }),
+        bolditalics: fontFilePath("Bold", { isItalic: true }),
       },
     };
     const printer = new PdfPrinter(fonts);
