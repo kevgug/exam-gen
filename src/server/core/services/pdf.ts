@@ -126,7 +126,7 @@ export class PDFService {
       };
     };
     const answerBox = ({ numLines }: { numLines: number }): ContentTable => {
-      const singleLine = [
+      const singleLine = () => [
         { text: "", marginTop: TEXT_LINE_HEIGHT },
         {
           canvas: [
@@ -150,9 +150,7 @@ export class PDFService {
             [
               {
                 stack: [
-                  ...Array.from({ length: numLines }, () =>
-                    JSON.parse(JSON.stringify(singleLine)),
-                  ).flat(),
+                  ...Array.from({ length: numLines }, singleLine).flat(),
                   { text: "", marginTop: TEXT_LINE_HEIGHT },
                 ],
               },
