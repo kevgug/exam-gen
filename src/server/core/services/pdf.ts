@@ -1,7 +1,11 @@
 import PdfPrinter from "pdfmake";
 import * as fs from "node:fs";
 import { Exam } from "../../../shared/types/exam";
-import { ContentTable, TDocumentDefinitions } from "pdfmake/interfaces";
+import {
+  Content,
+  ContentTable,
+  TDocumentDefinitions,
+} from "pdfmake/interfaces";
 import { QuestionGroup } from "../../../shared/types/question";
 
 export type ExamOptions = {
@@ -102,7 +106,7 @@ export class PDFService {
       questionNumIdx: number;
       content: string;
       options?: { isFirst: boolean };
-    }): TDocumentDefinitions["content"] => {
+    }): Content => {
       return {
         columns: [
           {
@@ -121,7 +125,6 @@ export class PDFService {
         marginTop: options.isFirst ? 0 : V_MARGIN,
       };
     };
-
     const answerBox = ({ numLines }: { numLines: number }): ContentTable => {
       const singleLine = [
         { text: "", marginTop: TEXT_LINE_HEIGHT },
@@ -167,7 +170,6 @@ export class PDFService {
         marginTop: 10,
       };
     };
-
     const writtenQuestion = ({
       depth,
       questionNumIdx,
@@ -180,7 +182,7 @@ export class PDFService {
       content: string;
       pointsAvailable: number;
       options?: { showPointsAvailable: boolean; isFirst: boolean };
-    }): TDocumentDefinitions["content"] => {
+    }): Content => {
       return {
         stack: [
           {
@@ -210,6 +212,80 @@ export class PDFService {
         ],
       };
     };
+    const multipleChoiceQuestion = ({
+      depth,
+      questionNumIdx,
+      content,
+      choices,
+      pointsAvailable,
+      options = { showPointsAvailable: true, isFirst: false },
+    }: {
+      depth: number;
+      questionNumIdx: number;
+      content: string;
+      choices: string[];
+      pointsAvailable: number;
+      options?: { showPointsAvailable: boolean; isFirst: boolean };
+    }): Content => {
+      const singleChoice = ({
+        content,
+        idx,
+      }: {
+        content: string;
+        idx: number;
+      }): Content => {
+        return {
+          columns: [
+            {
+              width: INDENT_SIZE,
+              text: `${alphabet.at(idx)?.toUpperCase() ?? "A"}.`,
+              bold: false,
+              alignment: "left",
+            },
+            {
+              width: "*",
+              text: [content],
+              lineHeight: 1.15,
+            },
+          ],
+          marginTop: V_MARGIN,
+        };
+      };
+
+      return {
+        stack: [
+          {
+            columns: [
+              {
+                width: INDENT_SIZE,
+                text: renderQuestionNum({ questionNumIdx, depth }),
+                bold: depth === 0,
+                alignment: "left",
+              },
+              {
+                width: "*",
+                text: [content],
+                lineHeight: 1.15,
+              },
+              {
+                width: "auto",
+                text: `[${pointsAvailable}]`,
+                marginLeft: 25,
+                alignment: "right",
+              },
+            ],
+            marginLeft: INDENT_SIZE * depth,
+            marginTop: options.isFirst ? 0 : V_MARGIN,
+          },
+          {
+            marginLeft: INDENT_SIZE * (depth + 1),
+            stack: choices.map((content, idx) => {
+              return singleChoice({ content, idx });
+            }),
+          },
+        ],
+      };
+    };
 
     const docDefinition: TDocumentDefinitions = {
       content: [
@@ -235,246 +311,13 @@ export class PDFService {
           content: "question 2",
           pointsAvailable: 3,
         }),
-
-        // Question group: 1.
-        {
-          columns: [
-            {
-              width: INDENT_SIZE,
-              text: "1.",
-              bold: true,
-              alignment: "left",
-            },
-            {
-              width: "*",
-              text: [
-                "A ball of mass 0.800 kg is attached to a string. The distance to the centre of the mass of the ball from the point of support is 95.0 cm. The ball is released from rest when the string is horizontal. When the string becomes vertical the ball collides with a block of mass 2.40 kg that is at rest on a horizontal surface.",
-              ],
-              lineHeight: 1.15,
-            },
-          ],
-          marginLeft: 0,
-          marginTop: 0,
-        },
-        // Question group: (a)
-        {
-          columns: [
-            {
-              width: INDENT_SIZE,
-              text: "(a)",
-              bold: false,
-              alignment: "left",
-            },
-            {
-              width: "*",
-              text: ["Just before the collision of the ball with the block,"],
-              lineHeight: 1.15,
-            },
-          ],
-          marginLeft: INDENT_SIZE,
-          marginTop: V_MARGIN,
-        },
-
-        // Question: (i)
-        {
-          columns: [
-            {
-              width: INDENT_SIZE,
-              text: "(i)",
-              bold: false,
-              alignment: "left",
-            },
-            {
-              width: "*",
-              text: ["draw a free-body diagram for the ball."],
-              lineHeight: 1.15,
-            },
-            {
-              width: "auto",
-              text: "[2]",
-              marginLeft: 25,
-              alignment: "right",
-            },
-          ],
-          marginLeft: INDENT_SIZE * 2,
-          marginTop: V_MARGIN,
-        },
-        // Answer box: (i)
-        {
-          table: {
-            widths: ["*"],
-            heights: ["auto"],
-            body: [
-              [
-                {
-                  stack: [
-                    { text: "", marginTop: TEXT_LINE_HEIGHT },
-                    {
-                      canvas: [
-                        {
-                          type: "line",
-                          x1: TEXT_LINE_HEIGHT,
-                          y1: 0,
-                          x2: 510 - TEXT_LINE_HEIGHT,
-                          y2: 0,
-                          dash: { length: 2, space: 5 },
-                        },
-                      ],
-                    },
-                    { text: "", marginTop: TEXT_LINE_HEIGHT },
-                    {
-                      canvas: [
-                        {
-                          type: "line",
-                          x1: TEXT_LINE_HEIGHT,
-                          y1: 0,
-                          x2: 510 - TEXT_LINE_HEIGHT,
-                          y2: 0,
-                          dash: { length: 2, space: 5 },
-                        },
-                      ],
-                    },
-                    { text: "", marginTop: TEXT_LINE_HEIGHT },
-                    {
-                      canvas: [
-                        {
-                          type: "line",
-                          x1: TEXT_LINE_HEIGHT,
-                          y1: 0,
-                          x2: 510 - TEXT_LINE_HEIGHT,
-                          y2: 0,
-                          dash: { length: 2, space: 5 },
-                        },
-                      ],
-                    },
-                    { text: "", marginTop: TEXT_LINE_HEIGHT },
-                    {
-                      canvas: [
-                        {
-                          type: "line",
-                          x1: TEXT_LINE_HEIGHT,
-                          y1: 0,
-                          x2: 510 - TEXT_LINE_HEIGHT,
-                          y2: 0,
-                          dash: { length: 2, space: 5 },
-                        },
-                      ],
-                    },
-                    { text: "", marginTop: TEXT_LINE_HEIGHT },
-                  ],
-                },
-              ],
-            ],
-          },
-          layout: {
-            hLineWidth: function () {
-              return 1;
-            },
-            vLineWidth: function () {
-              return 1;
-            },
-          },
-          marginTop: 10,
-        } as ContentTable,
-        // Multiple choice question: 1
-        {
-          columns: [
-            {
-              width: INDENT_SIZE,
-              text: "2.",
-              bold: true,
-              alignment: "left",
-            },
-            {
-              width: "*",
-              text: [
-                "The magnitude of the resultant of two forces acting on a body is 12 N. Which pair of forces acting on the body can combine to produce this resultant?",
-              ],
-              lineHeight: 1.15,
-            },
-            // {
-            //   width: "auto",
-            //   text: "[1]",
-            //   marginLeft: 25,
-            //   alignment: "right",
-            // },
-          ],
-          marginLeft: 0,
-          marginTop: 2 * V_MARGIN,
-        },
-        // Multiple choice options: 1
-        {
-          stack: [
-            {
-              columns: [
-                {
-                  width: INDENT_SIZE,
-                  text: "A.",
-                  bold: false,
-                  alignment: "left",
-                },
-                {
-                  width: "*",
-                  text: ["1 N and 2 N"],
-                  lineHeight: 1.15,
-                },
-              ],
-              marginLeft: INDENT_SIZE,
-              marginTop: V_MARGIN,
-            },
-            {
-              columns: [
-                {
-                  width: INDENT_SIZE,
-                  text: "B.",
-                  bold: false,
-                  alignment: "left",
-                },
-                {
-                  width: "*",
-                  text: ["1 N and 14 N"],
-                  lineHeight: 1.15,
-                },
-              ],
-              marginLeft: INDENT_SIZE,
-              marginTop: V_MARGIN,
-            },
-            {
-              columns: [
-                {
-                  width: INDENT_SIZE,
-                  text: "C.",
-                  bold: false,
-                  alignment: "left",
-                },
-                {
-                  width: "*",
-                  text: ["5 N and 6 N"],
-                  lineHeight: 1.15,
-                },
-              ],
-              marginLeft: INDENT_SIZE,
-              marginTop: V_MARGIN,
-            },
-            {
-              columns: [
-                {
-                  width: INDENT_SIZE,
-                  text: "D.",
-                  bold: false,
-                  alignment: "left",
-                },
-                {
-                  width: "*",
-                  text: ["6 N and 7 N"],
-                  lineHeight: 1.15,
-                },
-              ],
-              marginLeft: INDENT_SIZE,
-              marginTop: V_MARGIN,
-            },
-          ],
-        },
+        multipleChoiceQuestion({
+          depth: 0,
+          questionNumIdx: 0,
+          content: "question 1",
+          choices: ["one", "two", "three"],
+          pointsAvailable: 1,
+        }),
       ],
     };
 
