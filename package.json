@@ -25,6 +25,7 @@
     "@mistralai/mistralai": "^1.5.2",
     "@types/busboy": "^1.5.4",
     "@types/express": "^5.0.1",
+    "@types/mathjax-node": "^2.1.0",
     "@types/node-persist": "^3.1.8",
     "@types/pdfmake": "^0.2.11",
     "ai": "^4.2.8",
@@ -33,10 +34,12 @@
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "freestyle-sandboxes": "^0.0.35",
+    "mathjax-node": "^2.1.1",
     "md-to-pdf": "^5.2.4",
     "node-persist": "^4.0.4",
     "openai": "^4.90.0",
-    "pdfmake": "^0.2.18"
+    "pdfmake": "^0.2.18",
+    "sharp": "^0.33.5"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",

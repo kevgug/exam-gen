@@ -6,7 +6,9 @@ import {
   ContentTable,
   TDocumentDefinitions,
 } from "pdfmake/interfaces";
-import { QuestionGroup } from "../../../shared/types/question";
+import mjAPI from "mathjax-node";
+import path from "node:path";
+import sharp from "sharp";
 
 export type ExamOptions = {
   includeAnswers: boolean;
@@ -46,6 +48,44 @@ const V_NEW_QUESTION = 15;
 const TEXT_LINE_HEIGHT = 25;
 
 export class PDFService {
+  private static async latexToSvg(latex: string): Promise<string> {
+    return new Promise((resolve, reject) => {
+      mjAPI.typeset(
+        {
+          math: latex,
+          format: "TeX",
+          svg: true,
+        },
+        function (data) {
+          if (data.errors) {
+            reject(data.errors);
+          }
+          // data.svg contains the rendered equation
+          resolve(data.svg ?? "");
+        },
+      );
+    });
+  }
+
+  private static async latexToPng(
+    latex: string,
+  ): Promise<{ pngDataUrl: string; width: number; height: number }> {
+    // Convert LaTeX to SVG
+    const svg = await this.latexToSvg(latex);
+
+    // Convert SVG to PNG and retrieve dimensions
+    const { data, info } = await sharp(Buffer.from(svg))
+      .png()
+      .toBuffer({ resolveWithObject: true });
+
+    // Return PNG data URL along with dimensions
+    return {
+      pngDataUrl: `data:image/png;base64,${data.toString("base64")}`,
+      width: info.width,
+      height: info.height,
+    };
+  }
+
   public static async renderExam(
     path: string,
     exam: Exam,
@@ -97,7 +137,19 @@ export class PDFService {
       }
     };
 
-    const questionGroup = ({
+    const renderLatexPng = async (
+      latex: string,
+      height: number = 20,
+    ): Promise<Content> => {
+      const img = await PDFService.latexToPng(latex);
+      return {
+        image: img.pngDataUrl,
+        height: height,
+        width: height * (img.width / img.height),
+      };
+    };
+
+    const questionGroup = async ({
       depth,
       questionNumIdx,
       content,
@@ -107,7 +159,7 @@ export class PDFService {
       questionNumIdx: number;
       content: string;
       options?: { isFirst: boolean };
-    }): Content => {
+    }): Promise<Content> => {
       return {
         columns: [
           {
@@ -118,9 +170,10 @@ export class PDFService {
           },
           {
             width: "*",
-            text: content,
+            text: [content, await renderLatexPng("\\frac{1}{2}"), " more"],
             lineHeight: 1.15,
           },
+          await renderLatexPng("\\frac{1}{2}"),
         ],
         marginLeft: INDENT_SIZE * depth,
         marginTop: options.isFirst
@@ -312,7 +365,7 @@ export class PDFService {
 
     const docDefinition: TDocumentDefinitions = {
       content: [
-        questionGroup({
+        await questionGroup({
           depth: 0,
           questionNumIdx: 0,
           content: "question group 1",
@@ -320,7 +373,7 @@ export class PDFService {
             isFirst: true,
           },
         }),
-        questionGroup({
+        await questionGroup({
           depth: 1,
           questionNumIdx: 0,
           content: "question group 2",
