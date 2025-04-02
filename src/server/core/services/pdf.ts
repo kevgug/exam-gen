@@ -213,7 +213,7 @@ export class PDFService {
                     marginLeft: 25,
                     alignment: "right",
                   }
-                : { text: "" },
+                : { text: "", width: 0 },
             ],
             marginLeft: INDENT_SIZE * depth,
             marginTop: options.isFirst
@@ -293,7 +293,7 @@ export class PDFService {
                     marginLeft: 25,
                     alignment: "right",
                   }
-                : { text: "" },
+                : { text: "", width: 0 },
             ],
             marginLeft: INDENT_SIZE * depth,
             marginTop: options.isFirst
