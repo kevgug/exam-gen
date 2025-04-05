@@ -1,0 +1,551 @@
+[
+  {
+    "partName": "1",
+    "partLevel": 0,
+    "content": {
+      "setup": [
+        {
+          "setupType": "text",
+          "text": "A ball of mass 0.800 kg is attached to a string. The distance to the centre of the mass of the ball from the point of support is 95.0 cm. The ball is released from rest when the string is horizontal. When the string becomes vertical the ball collides with a block of mass 2.40 kg that is at rest on a horizontal surface."
+        }
+      ],
+      "task": null
+    },
+    "partType": "parent"
+  },
+  {
+    "partName": "a",
+    "partLevel": 1,
+    "content": {
+      "setup": [
+        {
+          "setupType": "text",
+          "text": "Just before the collision of the ball with the block,"
+        }
+      ],
+      "task": null
+    },
+    "partType": "parent"
+  },
+  {
+    "partName": "i",
+    "partLevel": 2,
+    "content": {
+      "setup": null,
+      "task": "draw a free-body diagram for the ball."
+    },
+    "partType": "question",
+    "questionType": "sketch",
+    "sketchBaseImage": "base64...",
+    "pointsAvailable": 2,
+    "answers": []
+  },
+  {
+    "partName": "ii",
+    "partLevel": 2,
+    "content": {
+      "setup": null,
+      "task": "show that the speed of the ball is about 4.3 ms-1."
+    },
+    "partType": "question",
+    "questionType": "write",
+    "writeIsComputational": true,
+    "pointsAvailable": 1,
+    "answers": []
+  },
+  {
+    "partName": "iii",
+    "partLevel": 2,
+    "content": {
+      "setup": null,
+      "task": "determine the tension of the string."
+    },
+    "partType": "question",
+    "questionType": "write",
+    "writeIsComputational": true,
+    "pointsAvailable": 1,
+    "answers": []
+  },
+  {
+    "partName": "b",
+    "partLevel": 1,
+    "content": {
+      "setup": [
+        {
+          "setupType": "text",
+          "text": "After the collision, the ball rebounds and the block moves with speed 2.16 m s-1."
+        }
+      ],
+      "task": null
+    },
+    "partType": "parent"
+  },
+  {
+    "partName": "i",
+    "partLevel": 2,
+    "content": {
+      "setup": null,
+      "task": "Show that the collision is inelastic."
+    },
+    "partType": "question",
+    "questionType": "write",
+    "writeIsComputational": true,
+    "pointsAvailable": 3,
+    "answers": []
+  },
+  {
+    "partName": "ii",
+    "partLevel": 2,
+    "content": {
+      "setup": null,
+      "task": "Calculate the maximum height risen by the centre of the ball."
+    },
+    "partType": "question",
+    "questionType": "write",
+    "writeIsComputational": true,
+    "pointsAvailable": 1,
+    "answers": []
+  },
+  {
+    "partName": "c",
+    "partLevel": 1,
+    "content": {
+      "setup": [
+        {
+          "setupType": "text",
+          "text": "The coefficient of dynamic friction between the block and the rough surface is 0.400."
+        }
+      ],
+      "task": "Estimate the distance travelled by the block on the rough surface until it stops."
+    },
+    "partType": "question",
+    "questionType": "write",
+    "writeIsComputational": true,
+    "pointsAvailable": 2,
+    "answers": []
+  },
+  {
+    "partName": "2",
+    "partLevel": 0,
+    "content": {
+      "setup": [
+        {
+          "setupType": "text",
+          "text": "A solid piece of chocolate of mass 82 g is placed in a pan over fire. Thermal energy is transferred to the chocolate at a constant rate. The graph shows the variation with time t, of the temperature T of the chocolate. At 6.0 minutes all the chocolate has melted."
+        },
+        {
+          "setupType": "image",
+          "image": "base64..."
+        },
+        {
+          "setupType": "text",
+          "text": "The specific heat capacity of solid chocolate is 1.6 × 103 J kg-1 K-1."
+        }
+      ],
+      "task": null
+    },
+    "partType": "parent"
+  },
+  {
+    "partName": "a",
+    "partLevel": 1,
+    "content": {
+      "setup": null,
+      "task": "Show that the average rate at which thermal energy is transferred into the chocolate is about 15 W."
+    },
+    "partType": "question",
+    "questionType": "write",
+    "writeIsComputational": true,
+    "pointsAvailable": 3,
+    "answers": []
+  },
+  {
+    "partName": "b",
+    "partLevel": 1,
+    "content": {
+      "setup": null,
+      "task": "Estimate the specific latent heat of fusion of chocolate."
+    },
+    "partType": "question",
+    "questionType": "write",
+    "writeIsComputational": true,
+    "pointsAvailable": 2,
+    "answers": []
+  },
+  {
+    "partName": "c",
+    "partLevel": 1,
+    "content": {
+      "setup": null,
+      "task": "Compare the internal energy of the chocolate at t=2 minutes with that at t=6 minutes."
+    },
+    "partType": "question",
+    "questionType": "write",
+    "writeIsComputational": true,
+    "pointsAvailable": 2,
+    "answers": []
+  },
+  {
+    "partName": "3",
+    "partLevel": 0,
+    "content": {
+      "setup": null,
+      "task": null
+    },
+    "partType": "parent"
+  },
+  {
+    "partName": "a",
+    "partLevel": 1,
+    "content": {
+      "setup": [
+        {
+          "setupType": "text",
+          "text": "A transverse water wave travels to the right. The diagram shows the shape of the surface of the water at time t = 0. P and Q show two corks floating on the surface."
+        },
+        {
+          "setupType": "image",
+          "image": "base64..."
+        }
+      ],
+      "task": null
+    },
+    "partType": "parent"
+  },
+  {
+    "partName": "i",
+    "partLevel": 2,
+    "content": {
+      "setup": null,
+      "task": "State what is meant by a transverse wave."
+    },
+    "partType": "question",
+    "questionType": "write",
+    "writeIsComputational": false,
+    "pointsAvailable": 1,
+    "answers": []
+  },
+  {
+    "partName": "ii",
+    "partLevel": 2,
+    "content": {
+      "setup": null,
+      "task": "The frequency of the wave is 0.50 Hz. Calculate the speed of the wave."
+    },
+    "partType": "question",
+    "questionType": "write",
+    "writeIsComputational": false,
+    "pointsAvailable": 1,
+    "answers": []
+  },
+  {
+    "partName": "iii",
+    "partLevel": 2,
+    "content": {
+      "setup": null,
+      "task": "Plot on the diagram the position of P at time t=0.50 s"
+    },
+    "partType": "question",
+    "questionType": "sketch",
+    "sketchBaseImageReference": -1,
+    "pointsAvailable": 1,
+    "answers": []
+  },
+  {
+    "partName": "iv",
+    "partLevel": 2,
+    "content": {
+      "setup": null,
+      "task": "Show that the phase difference between the oscillations of the two corks is p radians."
+    },
+    "partType": "question",
+    "questionType": "write",
+    "writeIsComputational": true,
+    "pointsAvailable": 1,
+    "answers": []
+  },
+  {
+    "partName": "b",
+    "partLevel": 1,
+    "content": {
+      "setup": [
+        {
+          "setupType": "text",
+          "text": "Monochromatic light is incident on two very narrow slits. The light that passes through the slits is observed on a screen. M is directly opposite the midpoint of the slits. x represents the displacement from M in the direction shown."
+        },
+        {
+          "setupType": "image",
+          "image": "base64..."
+        },
+        {
+          "setupType": "text",
+          "text": "A student argues that what will be observed on the screen will be a total of two bright spots opposite the slits."
+        }
+      ],
+      "task": "Explain why the student’s argument is incorrect."
+    },
+    "partType": "question",
+    "questionType": "write",
+    "writeIsComputational": false,
+    "pointsAvailable": 2,
+    "answers": []
+  },
+  {
+    "partName": "c",
+    "partLevel": 1,
+    "content": {
+      "setup": [
+        {
+          "setupType": "text",
+          "text": "The graph shows the actual variation with displacement x from M of the intensity of the light on the screen. I0 is the intensity of light at the screen from one slit only."
+        },
+        {
+          "setupType": "image",
+          "image": "base64..."
+        }
+      ],
+      "task": null
+    },
+    "partType": "parent"
+  },
+  {
+    "partName": "i",
+    "partLevel": 2,
+    "content": {
+      "setup": null,
+      "task": "Explain why the intensity of light at x=0 is 4 I0."
+    },
+    "partType": "question",
+    "questionType": "write",
+    "writeIsComputational": true,
+    "pointsAvailable": 2,
+    "answers": []
+  },
+  {
+    "partName": "ii",
+    "partLevel": 2,
+    "content": {
+      "setup": {
+        "setupType": "text",
+        "text": "The slits are separated by a distance of 0.18 mm and the distance to the screen is 2.2 m."
+      },
+      "task": "Determine, in m, the wavelength of light."
+    },
+    "partType": "question",
+    "questionType": "write",
+    "writeIsComputational": true,
+    "pointsAvailable": 2,
+    "answers": []
+  },
+  {
+    "partName": "iii",
+    "partLevel": 2,
+    "content": {
+      "setup": [
+        {
+          "setupType": "text",
+          "text": "The two slits are replaced by many slits of the same separation."
+        }
+      ],
+      "task": "State one feature of the intensity pattern that will remain the same and one that will change."
+    },
+    "partType": "question",
+    "questionType": "write",
+    "writeIsComputational": false,
+    "pointsAvailable": 2,
+    "answers": []
+  },
+  {
+    "partName": "d",
+    "partLevel": 1,
+    "content": {
+      "setup": null,
+      "task": null
+    },
+    "partType": "parent"
+  },
+  {
+    "partName": "i",
+    "partLevel": 2,
+    "content": {
+      "setup": [
+        {
+          "setupType": "text",
+          "text": "Two sources are viewed though a single slit. The graph shows the diffraction pattern of one source."
+        },
+        {
+          "setupType": "image",
+          "image": "base64..."
+        }
+      ],
+      "task": "Sketch, on the axes, the diffraction pattern of the second source when the images of the two sources are just resolved according to the Rayleigh criterion."
+    },
+    "partType": "question",
+    "questionType": "sketch",
+    "sketchBaseImageReference": -1,
+    "pointsAvailable": 1,
+    "answers": []
+  },
+  {
+    "partName": "ii",
+    "partLevel": 2,
+    "content": {
+      "setup": [
+        {
+          "setupType": "text",
+          "text": "Centaurus A is a galaxy a distance of 1.1×1023m away. A radio telescope of diameter 300 m operating at a wavelength of 3.2 cm is used to observe the galaxy. "
+        }
+      ],
+      "task": "Determine the minimum size of the radio emitting region of the galaxy that can be resolved by this telescope."
+    },
+    "partType": "question",
+    "questionType": "write",
+    "writeIsComputational": true,
+    "pointsAvailable": 2,
+    "answers": []
+  },
+  {
+    "partName": "5",
+    "partLevel": 0,
+    "content": {
+      "setup": null,
+      "task": null
+    },
+    "partType": "parent"
+  },
+  {
+    "partName": "a",
+    "partLevel": 1,
+    "content": {
+      "setup": null,
+      "task": "Identify with ticks [] in the table, the forces that can act on electrons and the forces that can act on quarks."
+    },
+    "partType": "question",
+    "questionType": "table",
+    "tableBaseMarkdown": "md...",
+    "pointsAvailable": 2,
+    "answers": []
+  },
+  {
+    "partName": "b",
+    "partLevel": 1,
+    "content": {
+      "setup": [
+        {
+          "setupType": "text",
+          "text": "The following data is available for atomic masses for the fusion reaction"
+        },
+        {
+          "setupType": "text",
+          "text": "21341H H He n+ → + :"
+        },
+        {
+          "setupType": "table",
+          "tableMarkdown": "md..."
+        }
+      ],
+      "task": null
+    },
+    "partType": "parent"
+  },
+  {
+    "partName": "i",
+    "partLevel": 2,
+    "content": {
+      "setup": null,
+      "task": "Show that the energy released is about 18 MeV."
+    },
+    "partType": "question",
+    "questionType": "write",
+    "writeIsComputational": true,
+    "pointsAvailable": 2
+  },
+  {
+    "partName": "ii",
+    "partLevel": 2,
+    "content": {
+      "setup": null,
+      "task": "Estimate the specific energy of hydrogen by finding the energy produced when 0.4 kg of 2 1H and 0.6 kg of 3 1H undergo fusion."
+    },
+    "partType": "question",
+    "questionType": "write",
+    "writeIsComputational": true,
+    "pointsAvailable": 2
+  },
+  {
+    "partName": "c",
+    "partLevel": 1,
+    "content": {
+      "setup": [
+        {
+          "setupType": "text",
+          "text": "It is hoped that nuclear fusion can be used for commercial production of energy."
+        },
+        {
+          "setupType": "text",
+          "text": "Outline"
+        }
+      ],
+      "task": null
+    },
+    "partType": "parent"
+  },
+  {
+    "partName": "i",
+    "partLevel": 2,
+    "content": {
+      "setup": null,
+      "task": "**two** difficulties of energy production by nuclear fusion."
+    },
+    "partType": "question",
+    "questionType": "write",
+    "writeIsComputational": false,
+    "writeMaxNumAnswers": 2,
+    "pointsAvailable": 2,
+    "answers": []
+  },
+  {
+    "partName": "ii",
+    "partLevel": 2,
+    "content": {
+      "setup": null,
+      "task": "**one** advantage of energy production by nuclear fusion compared to nuclear fission."
+    },
+    "partType": "question",
+    "questionType": "write",
+    "writeIsComputational": false,
+    "writeMaxNumAnswers": 1,
+    "pointsAvailable": 1,
+    "answers": []
+  },
+  {
+    "partName": "10",
+    "partLevel": 0,
+    "content": {
+      "setup": "The intensity of a wave can be defined as the energy per unit area per unit time.",
+      "task": "What is the unit of intensity expressed in fundamental SI units?"
+    },
+    "partType": "question",
+    "questionType": "multipleChoice",
+    "multipleChoiceOptions": [
+      {
+        "optionType": "text",
+        "text": "kg m-2 s-1"
+      },
+      {
+        "optionType": "text",
+        "text": "kg m-2 s-3"
+      },
+      {
+        "optionType": "text",
+        "text": "kg s-2"
+      },
+      {
+        "optionType": "text",
+        "text": "kg s-3"
+      }
+    ],
+    "pointsAvailable": 1,
+    "answers": []
+  }
+]
