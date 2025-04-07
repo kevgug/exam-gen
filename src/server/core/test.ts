@@ -4,7 +4,6 @@ dotenv.config();
 import { PDFService } from "./services/pdf";
 import { DATA_DIR, FileMetadata } from "../config";
 import path from "node:path";
-import { Exam } from "../../shared/types/exam";
 import { readFile, writeFile } from "node:fs/promises";
 import { OcrService } from "./services/ocr";
 import { ExamCore } from "./exam";

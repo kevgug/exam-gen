@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { jsonSchema, Schema, zodSchema } from "ai";
+import { Schema, zodSchema } from "ai";
 import { readFile } from "fs/promises";
 import { PROMPT_DIR } from "../../config";
 import path from "path";
