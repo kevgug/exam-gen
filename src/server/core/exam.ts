@@ -27,20 +27,7 @@ export class ExamCore {
 
     console.log("exam", exam);
 
-    const validParts = exam.parts.filter((part) => {
-      if (
-        part.questionType === "multipleChoice" &&
-        !part.multipleChoiceOptionChunks
-      ) {
-        return false;
-      }
-      return true;
-    });
-
-    return {
-      ...exam,
-      parts: validParts,
-    } as Exam;
+    return exam;
   }
 
   public static async generateNew({

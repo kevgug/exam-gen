@@ -1,23 +1,20 @@
 export type ExamPartChunk = {
   chunkType: "text" | "table" | "image";
   chunkValue: string;
+  chunkRole: "context" | "task";
 };
 export type ExamPart = {
   partName: string;
   partLevel: number;
-  content: {
-    setupChunks: ExamPartChunk[] | null;
-    task: string | null;
+  contentChunks: ExamPartChunk[] | null;
+  partRole: "context" | "task";
+  taskDetails: {
+    type: "write" | "multipleChoice" | "table" | "sketch";
+    pointsAvailable: number | null;
+    isComputational: boolean;
+    write_isComputational: boolean | null;
+    multipleChoice_type: "single" | "multiple";
   };
-  partType: "parent" | "question";
-  questionType: "write" | "multipleChoice" | "table" | "sketch" | null;
-  writeIsComputational: boolean | null;
-  writeNumAnswersExpected: number | null;
-  multipleChoiceOptionChunks: ExamPartChunk[] | null;
-  tableBaseMarkdown: string | null;
-  sketchBaseImage: string | null;
-  pointsAvailable: number | null;
-  answerChunks: ExamPartChunk[] | null;
 };
 export type Exam = {
   generated?: boolean;

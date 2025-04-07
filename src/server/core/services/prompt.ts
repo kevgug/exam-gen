@@ -3,7 +3,6 @@ import { jsonSchema, Schema, zodSchema } from "ai";
 import { readFile } from "fs/promises";
 import { PROMPT_DIR } from "../../config";
 import path from "path";
-import { Exam } from "../../../shared/types/exam";
 
 export type PromptName = "ExamCore_getFromMarkdown";
 export type SchemaInfo = {
@@ -25,26 +24,31 @@ export class PromptService {
         const ExamPartChunk = z.object({
           chunkType: z.enum(["text", "table", "image"]),
           chunkValue: z.string(),
+          chunkRole: z.enum(["context", "task", "answerField", "answerOption"]),
         });
         const Exam = z.object({
           parts: z.array(
             z.object({
               partName: z.string(),
               partLevel: z.number(),
-              content: z.object({
-                setupChunks: z.array(ExamPartChunk).nullable(),
-                task: z.string().nullable(),
-              }),
-              partType: z.enum(["parent", "question"]),
-              questionType: z
-                .enum(["write", "multipleChoice", "table", "sketch"])
+              contentChunks: z.array(ExamPartChunk).nullable(),
+              partRole: z.enum(["context", "task"]),
+              taskDetails: z
+                .object({
+                  questionType: z.enum([
+                    "write",
+                    "multipleChoice",
+                    "table",
+                    "sketch",
+                  ]),
+                  pointsAvailable: z.number().nullable(),
+                  isComputational: z.boolean(),
+                  write_numAnswersExpected: z.number().nullable(),
+                  multipleChoice_type: z
+                    .enum(["single", "multiple"])
+                    .nullable(),
+                })
                 .nullable(),
-              writeIsComputational: z.boolean().nullable(),
-              writeNumAnswersExpected: z.number().nullable(),
-              multipleChoiceOptionChunks: z.array(ExamPartChunk).nullable(),
-              tableBaseMarkdown: z.string().nullable(),
-              sketchBaseImage: z.string().nullable(),
-              pointsAvailable: z.number().nullable(),
             }),
           ),
         });

@@ -31,7 +31,6 @@ const PDF_NAME = "paper2";
       imgsById: inputImgsById,
     }),
   );
-  return;
   const inputExam = await ExamCore.getFromMarkdown(inputMdStr);
   // const inputExam: Exam = {
   //   generated: true,

@@ -34,7 +34,7 @@ Candidate session number
 
 Answer all questions. Answers must be written within the answer boxes provided.
 
-1. A ball of mass 0.50 kg with speed $v = 2.0\text{ m/s}$.
+1. A ball of mass 0.50 kg has speed $v = 2.0\text{ m/s}$.
    $\square$
    $\square$
    (a) Calculate kinetic energy. [3]
@@ -97,128 +97,148 @@ Answers written on this page will not be marked.
     {
       "partName": "1",
       "partLevel": 0,
-      "content": {
-        "setupChunks": [
-          {
-            "chunkType": "text",
-            "chunkValue": "A ball of mass 0.50 kg with speed $v = 2.0\\text{ m/s}$."
-          }
-        ],
-        "task": null
-      },
-      "partType": "parent",
-      "questionType": null,
-      "writeIsComputational": null,
-      "writeNumAnswersExpected": null,
-      "multipleChoiceOptionChunks": null,
-      "tableBaseMarkdown": null,
-      "sketchBaseImage": null,
-      "pointsAvailable": null
+      "contentChunks": [
+        {
+          "chunkType": "text",
+          "chunkValue": "A ball of mass 0.50 kg has speed $v = 2.0\\text{ m/s}$.",
+          "chunkRole": "context"
+        }
+      ],
+      "partRole": "context",
+      "taskDetails": null
     },
     {
       "partName": "a",
       "partLevel": 1,
-      "content": {
-        "setupChunks": null,
-        "task": "Calculate kinetic energy."
-      },
-      "partType": "question",
-      "questionType": "write",
-      "writeIsComputational": true,
-      "writeNumAnswersExpected": null,
-      "multipleChoiceOptionChunks": null,
-      "tableBaseMarkdown": null,
-      "sketchBaseImage": null,
-      "pointsAvailable": 3
+      "contentChunks": [
+        {
+          "chunkType": "text",
+          "chunkValue": "Calculate kinetic energy.",
+          "chunkRole": "task"
+        }
+      ],
+      "partRole": "task",
+      "taskDetails": {
+        "type": "write",
+        "isComputational": true,
+        "pointsAvailable": 3,
+        "write_numAnswersExpected": null,
+        "multipleChoice_type": null
+      }
     },
     {
       "partName": "b",
       "partLevel": 1,
-      "content": {
-        "setupChunks": [{ "chunkType": "image", "chunkValue": "img-0.jpeg" }],
-        "task": null
-      },
-      "partType": "parent",
-      "questionType": null,
-      "writeIsComputational": null,
-      "writeNumAnswersExpected": null,
-      "multipleChoiceOptionChunks": null,
-      "tableBaseMarkdown": null,
-      "sketchBaseImage": null,
-      "pointsAvailable": null
+      "contentChunks": [
+        {
+          "chunkType": "image",
+          "chunkValue": "img-0.jpeg",
+          "chunkRole": "context"
+        }
+      ],
+      "partRole": "context",
+      "taskDetails": null
     },
     {
       "partName": "i",
       "partLevel": 2,
-      "content": {
-        "setupChunks": null,
-        "task": "State **two** experimental precautions the student should take."
-      },
-      "partType": "question",
-      "questionType": "write",
-      "writeIsComputational": false,
-      "writeNumAnswersExpected": 2,
-      "multipleChoiceOptionChunks": null,
-      "tableBaseMarkdown": null,
-      "sketchBaseImage": null,
-      "pointsAvailable": 3
+      "contentChunks": [
+        {
+          "chunkType": "text",
+          "chunkValue": "State {{numAnswersExpected}} experimental precautions the student should take.",
+          "chunkRole": "task"
+        }
+      ],
+      "partRole": "task",
+      "taskDetails": {
+        "type": "write",
+        "isComputational": false,
+        "pointsAvailable": 3,
+        "write_numAnswersExpected": 2,
+        "multipleChoice_type": null
+      }
     },
     {
       "partName": "ii",
       "partLevel": 2,
-      "content": {
-        "setupChunks": null,
-        "task": "Draw the path of the ball on the image."
-      },
-      "partType": "question",
-      "questionType": "sketch",
-      "writeIsComputational": null,
-      "writeNumAnswersExpected": null,
-      "multipleChoiceOptionChunks": null,
-      "tableBaseMarkdown": null,
-      "sketchBaseImage": "img-0.jpeg",
-      "pointsAvailable": 1
+      "contentChunks": [
+        {
+          "chunkType": "text",
+          "chunkValue": "Draw the path of the ball on the image.",
+          "chunkRole": "task"
+        },
+        {
+          "chunkType": "image",
+          "chunkValue": "img-0.jpeg",
+          "chunkRole": "answerField"
+        }
+      ],
+      "partRole": "task",
+      "taskDetails": {
+        "type": "sketch",
+        "isComputational": false,
+        "pointsAvailable": 1,
+        "write_numAnswersExpected": null,
+        "multipleChoice_type": null
+      }
     },
     {
       "partName": "iii",
       "partLevel": 2,
-      "content": {
-        "setupChunks": null,
-        "task": "Complete the table for the ball's motion."
-      },
-      "partType": "question",
-      "questionType": "table",
-      "writeIsComputational": true,
-      "writeNumAnswersExpected": null,
-      "multipleChoiceOptionChunks": null,
-      "tableBaseMarkdown": "| Time (s) | Height (m) | Speed (m/s) |\n|----------|------------|-------------|\n| 0        | 0          | 2.0         |\n| 0.1      |            |             |\n| 0.2      |            |             |",
-      "sketchBaseImage": null,
-      "pointsAvailable": 2
+      "contentChunks": [
+        {
+          "chunkType": "text",
+          "chunkValue": "Complete the table for the ball's motion.",
+          "chunkRole": "task"
+        },
+        {
+          "chunkType": "table",
+          "chunkValue": "| Time (s) | Height (m) | Speed (m/s) |\n|----------|------------|-------------|\n| 0        | 0          | 2.0         |\n| 0.1      |            |             |\n| 0.2      |            |             |",
+          "chunkRole": "answerField"
+        }
+      ],
+      "partRole": "task",
+      "taskDetails": {
+        "type": "table",
+        "pointsAvailable": 2,
+        "isComputational": true,
+        "write_numAnswersExpected": null,
+        "multipleChoice_type": null
+      }
     },
     {
       "partName": "2",
       "partLevel": 0,
-      "content": {
-        "setupChunks": [{ "chunkType": "image", "chunkValue": "img-1.jpeg" }],
-        "task": "Select the correct row for these physical quantities:"
-      },
-      "partType": "question",
-      "questionType": "multipleChoice",
-      "writeIsComputational": null,
-      "writeNumAnswersExpected": null,
-      "multipleChoiceOptionChunks": [
+      "contentChunks": [
         {
-          "chunkType": "table",
-          "chunkValue": "| Quantity | Symbol | SI Unit |\n|----------|--------|--------|\n| Energy   | E      | joule   |"
+          "chunkType": "image",
+          "chunkValue": "img-1.jpeg",
+          "chunkRole": "context"
+        },
+        {
+          "chunkType": "text",
+          "chunkValue": "Select the correct row for these physical quantities:",
+          "chunkRole": "task"
         },
         {
           "chunkType": "table",
-          "chunkValue": "| Quantity | Symbol | SI Unit |\n|----------|--------|--------|\n| Power    | P      | watt    |"
+          "chunkValue": "| Quantity | Symbol | SI Unit |\n|----------|--------|--------|\n| Energy   | E      | joule   |",
+          "chunkRole": "answerOption"
+        },
+        {
+          "chunkType": "table",
+          "chunkValue": "| Quantity | Symbol | SI Unit |\n|----------|--------|--------|\n| Power    | P      | watt    |",
+          "chunkRole": "answerOption"
         }
       ],
-      "tableBaseMarkdown": null,
-      "sketchBaseImage": null,
-      "pointsAvailable": null
+      "partRole": "task",
+      "taskDetails": {
+        "type": "multipleChoice",
+        "pointsAvailable": null,
+        "isComputational": false,
+        "write_numAnswersExpected": null,
+        "multipleChoice_type": "single"
+      }
     }
   ]
 }
@@ -227,15 +247,14 @@ Answers written on this page will not be marked.
 ## Rules
 
 1. partLevel: 0=main, 1=sub, 2=sub-sub, 3=sub-sub-sub, etc. (increasing with nesting depth)
-2. Tasks are never part of setup; conceptually, setup builds up to the task
-3. partType: "parent" (no task) or "question" (has task). If "parent", all question-specific properties MUST be null (questionType, writeIsComputational, writeNumAnswersExpected, multipleChoiceOptionChunks, tableBaseMarkdown, sketchBaseImage, pointsAvailable)
-4. For sketch questions, set sketchBaseImage to the image filename (e.g., "img-0.jpeg")
-5. Preserve LaTeX (properly escaped)
-6. Extract points from [n]
-7. Set writeNumAnswersExpected ONLY when question explicitly states a quantity (e.g., "State **two** reasons"); otherwise it must be null
-8. Include all schema properties even if null
-9. For tables, use chunkType: "table" and include the markdown table in chunkValue
-10. Ensure every question and subpart in the exam is captured, including those with non-standard formatting. Parse sequentially from top to bottom, creating a separate part entry for each distinct question component identified by numbering or lettering (e.g., 1, 2, a, b, i, ii, etc.).
+2. partRole: "context" (no task) or "task" (has task). A task contains either the primary imperative (e.g., explain, indentify, outline, etc) or is grammatically a question. If part has partRole "context", taskDetails MUST be null.
+3. For sketch questions, set the single answer field chunk to the image (e.g., "img-0.jpeg")
+4. Preserve LaTeX (properly escaped)
+5. Extract points from [n]
+6. Set write_numAnswersExpected ONLY when question explicitly states a quantity (e.g., "State **two** reasons...") and write as cloze in the text chunk (e.g. "State {{numAnswersExpected}} reasons..."); otherwise it must be null
+7. Include all schema properties even if null
+8. For tables, use chunkType: "table" and include the markdown table in chunkValue
+9. Ensure every question and subpart in the exam is captured, including those with non-standard formatting. Parse sequentially from top to bottom, creating a separate part entry for each distinct question component identified by numbering or lettering (e.g., 1, 2, a, b, i, ii, etc.).
 
 ## Task
 
