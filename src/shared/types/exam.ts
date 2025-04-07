@@ -20,6 +20,6 @@ export type ExamPart = {
   answerChunks: ExamPartChunk[] | null;
 };
 export type Exam = {
-  generated: boolean;
+  generated?: boolean;
   parts: ExamPart[];
 };

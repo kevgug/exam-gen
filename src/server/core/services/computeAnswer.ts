@@ -1,9 +1,6 @@
 import { createOpenAI } from "@ai-sdk/openai";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { executeTool } from "freestyle-sandboxes/ai";
-
-import { Question } from "../../../shared/types/question";
-import { generateText } from "ai";
 import { ExamPart, ExamPartChunk } from "../../../shared/types/exam";
 
 const openai = createOpenAI({

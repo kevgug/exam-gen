@@ -1,122 +1,26 @@
 import OpenAI from "openai";
+import { openai } from "@ai-sdk/openai";
+import { generateObject } from "ai";
 import { Exam, ExamPart } from "../../shared/types/exam";
-import { Question, QuestionGroup } from "../../shared/types/question";
 import { ComputeAnswerService } from "./services/computeAnswer";
 import { PromptService } from "./services/prompt";
-
-const openai = new OpenAI();
 
 export class ExamCore {
   public static async getFromMarkdown(mdStr: string): Promise<Exam> {
     // Invoke LLM
-    const response = await openai.responses.create({
-      model: "o3-mini",
-      input: [
-        {
-          role: "system",
-          content: await PromptService.get("ExamCore_getFromMarkdown"),
-        },
-        {
-          role: "user",
-          content: mdStr,
-        },
-      ],
-      text: {
-        format: {
-          type: "json_schema",
-          name: "structuredExam",
-          description:
-            "Hierarchical exam representation with nested parts, questions, and metadata.",
-          strict: true,
-          schema: {
-            type: "object",
-            properties: {
-              parts: {
-                type: "array",
-                items: {
-                  type: "object",
-                  properties: {
-                    partName: { type: "string" },
-                    partLevel: { type: "number" },
-                    content: {
-                      type: "object",
-                      properties: {
-                        setupChunks: {
-                          anyOf: [
-                            { $ref: "#/$defs/ExamPartChunk" },
-                            { type: "null" },
-                          ],
-                        },
-                        task: { type: ["string", "null"] },
-                      },
-                      required: ["setupChunks", "task"],
-                      additionalProperties: false,
-                    },
-                    partType: {
-                      type: "string",
-                      enum: ["parent", "question"],
-                    },
-                    questionType: {
-                      anyOf: [
-                        {
-                          type: "string",
-                          enum: ["write", "multipleChoice", "table", "sketch"],
-                        },
-                        { type: "null" },
-                      ],
-                    },
-                    writeIsComputational: { type: ["boolean", "null"] },
-                    writeNumAnswersExpected: { type: ["number", "null"] },
-                    multipleChoiceOptionChunks: {
-                      type: ["array", "null"],
-                      items: { $ref: "#/$defs/ExamPartChunk" },
-                    },
-                    tableBaseMarkdown: { type: ["string", "null"] },
-                    sketchBaseImage: { type: ["string", "null"] },
-                    pointsAvailable: { type: ["number", "null"] },
-                  },
-                  required: [
-                    "partName",
-                    "partLevel",
-                    "content",
-                    "partType",
-                    "questionType",
-                    "writeIsComputational",
-                    "writeNumAnswersExpected",
-                    "multipleChoiceOptionChunks",
-                    "tableBaseMarkdown",
-                    "sketchBaseImage",
-                    "pointsAvailable",
-                  ],
-                  additionalProperties: false,
-                },
-              },
-            },
-            required: ["parts"],
-            additionalProperties: false,
-            $defs: {
-              ExamPartChunk: {
-                type: "object",
-                properties: {
-                  chunkType: {
-                    type: "string",
-                    enum: ["text", "table", "image"],
-                  },
-                  chunkValue: { type: "string" },
-                },
-                required: ["chunkType", "chunkValue"],
-                additionalProperties: false,
-              },
-            },
-          },
-        },
-      },
+    const schemaInfo = PromptService.schemaInfo("ExamCore_getFromMarkdown");
+    const sysPrompt = await PromptService.sysPrompt("ExamCore_getFromMarkdown");
+    const { object } = await generateObject({
+      model: openai("o3-mini"),
+      system: sysPrompt,
+      ...schemaInfo,
+      prompt: mdStr,
     });
 
     // Parse LLM response as json
     let exam: Exam;
     try {
-      exam = { ...JSON.parse(response.output_text), generated: false } as Exam;
+      exam = object as Exam;
     } catch (e: any) {
       throw new Error("failed to parse ocr output into array of questions");
     }
@@ -149,6 +53,8 @@ export class ExamCore {
     pastExams: Exam[];
   }): Promise<Exam> {
     // Invoke LLM
+    return { parts: [] };
+    /*
     const response = await openai.responses.create({
       model: "chatgpt-4o-latest",
       input: [
@@ -254,5 +160,6 @@ export class ExamCore {
     console.log("with answers:\n", JSON.stringify(newExam));
 
     return newExam;
+    */
   }
 }

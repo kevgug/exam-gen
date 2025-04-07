@@ -24,6 +24,14 @@ const PDF_NAME = "paper2";
   });
   const { mdStr: inputMdStr, imgsById: inputImgsById } = inputCombinedMd;
   await writeFile(path.join(DATA_DIR, "file", "test.md"), inputMdStr);
+  await writeFile(
+    path.join(DATA_DIR, "file", "test-imgs.md"),
+    OcrService.fillImagesInMd({
+      mdString: inputMdStr,
+      imgsById: inputImgsById,
+    }),
+  );
+  return;
   const inputExam = await ExamCore.getFromMarkdown(inputMdStr);
   // const inputExam: Exam = {
   //   generated: true,
