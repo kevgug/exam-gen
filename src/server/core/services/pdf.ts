@@ -90,7 +90,7 @@ export class PDFService {
     path: string,
     exam: Exam,
     options: ExamOptions = { includeAnswers: false },
-  ): Promise<any> {
+  ): Promise<void> {
     const fontsDir = "src/server/core/services/pdfFonts/";
     const fontFamily = "Roboto";
     const fontFilePath = (

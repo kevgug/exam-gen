@@ -1,156 +1,33 @@
 import OpenAI from "openai";
-import { Exam } from "../../shared/types/exam";
-import { Question, QuestionGroup } from "../../shared/types/question";
+import { openai } from "@ai-sdk/openai";
+import { generateObject } from "ai";
+import { Exam, ExamPart } from "../../shared/types/exam";
 import { ComputeAnswerService } from "./services/computeAnswer";
-
-const openai = new OpenAI();
+import { PromptService } from "./services/prompt";
 
 export class ExamCore {
-  private static traverse = async (
-    questionGroup: QuestionGroup,
-    fn: (node: Question | QuestionGroup) => Promise<void>,
-  ) => {
-    const toVisit = [questionGroup];
-    while (toVisit.length > 0) {
-      const current = toVisit.pop();
-      if (current) {
-        await fn(current); // await the callback function
-        if ("subItems" in current && current.subItems) {
-          toVisit.push(...(current.subItems as QuestionGroup[]));
-        }
-      }
-    }
-  };
-
   public static async getFromMarkdown(mdStr: string): Promise<Exam> {
-    const cleanMd = await openai.responses
-      .create({
-        model: "chatgpt-4o-latest",
-        input: [
-          {
-            role: "system",
-            content:
-              "Remove artifacts from OCR as well as any page references or references to continued questions or physical pages. Output just the md, nothing else.",
-          },
-          {
-            role: "user",
-            content: mdStr,
-          },
-        ],
-      })
-      .then((response) => response.output_text);
-
     // Invoke LLM
-    const response = await openai.responses.create({
-      model: "chatgpt-4o-latest",
-      input: [
-        {
-          role: "system",
-          content:
-            "You are STEM teacher. Convert the markdown exam into structured JSON. Going from a question number to question letter (a) means introducing a new question subgroup, as does going from a question letter to roman numeral (i), and so on. You must include the relevant question letter and roman numerals at the start of `content`, but never inside `contentGroup`. Question types are: multiple choice, numerical response (question asking for computation), and freeform response (question asking for explanation or reciting knowledge). For each multiple choice question, put the number of multiple choice choice options in the `multipleChoiceOptionCount` field. You MUST include all questions from the md.",
-        },
-        {
-          role: "user",
-          content: cleanMd,
-        },
-      ],
-      text: {
-        format: {
-          type: "json_schema",
-          name: "examSchema",
-          description: "Schema for a STEM exam",
-          schema: {
-            type: "object",
-            properties: {
-              questionGroups: {
-                $ref: "#/$defs/NodeList",
-              },
-            },
-            required: ["questionGroups"],
-            additionalProperties: false,
-            $defs: {
-              NodeList: {
-                type: "array",
-                items: {
-                  anyOf: [
-                    {
-                      type: "object",
-                      properties: {
-                        type: {
-                          type: "string",
-                          enum: [
-                            "multiple-choice",
-                            "freeform-response",
-                            "numerical-response",
-                          ],
-                        },
-                        content: { type: "string" },
-                        multipleChoiceOptionCount: {
-                          type: ["number", "null"],
-                        },
-                        multipleChoiceOptions: {
-                          type: ["array", "null"],
-                          items: { type: "string" },
-                        },
-                        points: { type: "number" },
-                      },
-                      required: [
-                        "type",
-                        "content",
-                        "multipleChoiceOptionCount",
-                        "multipleChoiceOptions",
-                        "points",
-                      ],
-                      additionalProperties: false,
-                    },
-                    {
-                      type: "object",
-                      properties: {
-                        groupContent: { type: "string" },
-                        subItems: { $ref: "#/$defs/NodeList" },
-                      },
-                      required: ["groupContent", "subItems"],
-                      additionalProperties: false,
-                    },
-                  ],
-                },
-              },
-            },
-          },
-          strict: true,
-        },
-      },
+    const schemaInfo = PromptService.schemaInfo("ExamCore_getFromMarkdown");
+    const sysPrompt = await PromptService.sysPrompt("ExamCore_getFromMarkdown");
+    const { object } = await generateObject({
+      model: openai("o3-mini"),
+      system: sysPrompt,
+      ...schemaInfo,
+      prompt: mdStr,
     });
 
     // Parse LLM response as json
     let exam: Exam;
     try {
-      exam = JSON.parse(response.output_text) as Exam;
+      exam = object as Exam;
     } catch (e: any) {
       throw new Error("failed to parse ocr output into array of questions");
     }
 
     console.log("exam", exam);
 
-    const validQuestionGroups = exam.questionGroups.filter((questionGroup) => {
-      let invalid = false;
-
-      this.traverse(questionGroup, async (node) => {
-        if (
-          "type" in node &&
-          node.type === "multiple-choice" &&
-          !node.multipleChoiceOptionCount
-        ) {
-          invalid = true;
-        }
-      });
-
-      return !invalid;
-    });
-
-    return {
-      questionGroups: validQuestionGroups,
-    } as Exam;
+    return exam;
   }
 
   public static async generateNew({
@@ -163,6 +40,8 @@ export class ExamCore {
     pastExams: Exam[];
   }): Promise<Exam> {
     // Invoke LLM
+    return { parts: [] };
+    /*
     const response = await openai.responses.create({
       model: "chatgpt-4o-latest",
       input: [
@@ -248,27 +127,26 @@ export class ExamCore {
 
     console.log("before:\n", JSON.stringify(newExam));
 
-    for (const rootGroup of newExam.questionGroups) {
-      console.log("-- root group--");
-      let prevQuestions: Question[] = [];
+    let prevParts: ExamPart[] = [];
+    for (const part of newExam.parts) {
+      // Reset previous parts array at root question
+      if (part.partLevel === 0) {
+        prevParts = [];
+      }
 
-      // Await the traverse function
-      await this.traverse(rootGroup, async (node) => {
-        if ("content" in node) {
-          // type is Question
-          console.log("# previousQs:", JSON.stringify(prevQuestions));
-          const answer = await ComputeAnswerService.answer({
-            prevQuestions: prevQuestions,
-            currQuestion: node as Question,
-          });
-          node.answer = answer;
-          prevQuestions.push(node);
-        }
-      });
+      // Generate answers
+      if (part.partType === "question") {
+        part.answerChunks = await ComputeAnswerService.answer({
+          prevParts: prevParts,
+          currPart: part,
+        });
+      }
+      prevParts.push(part);
     }
 
     console.log("with answers:\n", JSON.stringify(newExam));
 
     return newExam;
+    */
   }
 }

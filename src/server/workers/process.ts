@@ -31,10 +31,10 @@ const path = process.argv[2];
   );
 
   console.log(`[WORKER#${process.pid}] ocr done. parsing questions...`);
-//   writeFile("tmp.md", md);
+  //   writeFile("tmp.md", md);
 
   const exam = await ExamCore.getFromMarkdown(md);
-//   writeFile("tmp.json", JSON.stringify(exam));
+  //   writeFile("tmp.json", JSON.stringify(exam));
 
   console.log(
     `[WORKER#${process.pid}] question parsing done. sending questions to parent...`,
