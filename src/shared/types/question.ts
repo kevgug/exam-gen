@@ -1,5 +1,3 @@
-import { Id, PointWeighting } from "./common";
-
 export type Question = {
   type: "multiple-choice" | "freeform-response" | "numerical-response";
   content: string;

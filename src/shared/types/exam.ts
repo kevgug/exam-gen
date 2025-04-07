@@ -1,43 +1,25 @@
-import { Id, PointWeighting } from "./common";
-import { QuestionGroup } from "./question";
-
-// export type ExamMetadata = {
-//   numQuestions: number;
-//   weighting: PointWeighting;
-// };
-
-// export type Exam = {
-//   generated: boolean | undefined;
-//   questionGroups: QuestionGroup[];
-//   // metadata: ExamMetadata;
-// };
-
-export type ExamPartContentSetupChunk = {
+export type ExamPartChunk = {
   chunkType: "text" | "table" | "image";
   chunkValue: string;
-};
-export type ExamPartMultipleChoiceOption = {
-  optionType: "text" | "table" | "image";
-  optionValue: string;
 };
 export type ExamPart = {
   partName: string;
   partLevel: number;
   content: {
-    setupChunks: ExamPartContentSetupChunk[] | null;
+    setupChunks: ExamPartChunk[] | null;
     task: string | null;
   };
   partType: "parent" | "question";
   questionType: "write" | "multipleChoice" | "table" | "sketch" | null;
   writeIsComputational: boolean | null;
   writeNumAnswersExpected: number | null;
-  multipleChoiceOptions: ExamPartMultipleChoiceOption[] | null;
+  multipleChoiceOptionChunks: ExamPartChunk[] | null;
   tableBaseMarkdown: string | null;
   sketchBaseImage: string | null;
-  sketchBaseReferenceImage: number | null;
   pointsAvailable: number | null;
+  answerChunks: ExamPartChunk[] | null;
 };
 export type Exam = {
-  generated?: boolean;
+  generated: boolean;
   parts: ExamPart[];
 };

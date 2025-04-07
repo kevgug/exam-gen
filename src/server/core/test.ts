@@ -5,24 +5,43 @@ import { PDFService } from "./services/pdf";
 import { DATA_DIR, FileMetadata } from "../config";
 import path from "node:path";
 import { Exam } from "../../shared/types/exam";
+import { readFile, writeFile } from "node:fs/promises";
+import { OcrService } from "./services/ocr";
+import { ExamCore } from "./exam";
 
-const PDF_NAME = "4b51c184-b16c-49f2-900a-0f63ce40e443.pdf";
+const PDF_NAME = "paper2";
 
 (async () => {
   console.log("test.ts start.");
 
-  const id = "test";
-  const pdfFileMetadata: FileMetadata = {
-    filename: `${id}.pdf`,
-    path: path.join(DATA_DIR, "file", `${id}.pdf`),
+  const inputPdf: FileMetadata = {
+    filename: `${PDF_NAME}.pdf`,
+    path: path.join(DATA_DIR, "file", `${PDF_NAME}.pdf`),
   };
+  const inputCombinedMd = await OcrService.extractTextFromPdf({
+    pdfName: inputPdf.filename,
+    pdfBuffer: await readFile(inputPdf.path),
+  });
+  const { mdStr: inputMdStr, imgsById: inputImgsById } = inputCombinedMd;
+  await writeFile(path.join(DATA_DIR, "file", "test.md"), inputMdStr);
+  const inputExam = await ExamCore.getFromMarkdown(inputMdStr);
+  // const inputExam: Exam = {
+  //   generated: true,
+  //   parts: JSON.parse(
+  //     (await readFile(path.join(DATA_DIR, "file", "test.json"))).toString(),
+  //   ),
+  // };
+  await writeFile(
+    path.join(DATA_DIR, "file", "test.json"),
+    JSON.stringify(inputExam),
+  );
+  return;
 
-  const exam: Exam = {
-    generated: true,
-    questionGroups: [],
+  const generatedPdf: FileMetadata = {
+    filename: `${PDF_NAME}-generated.pdf`,
+    path: path.join(DATA_DIR, "file", `${PDF_NAME}-generated.pdf`),
   };
-
-  await PDFService.renderExam(pdfFileMetadata.path, exam, {
+  await PDFService.renderExam(generatedPdf.path, inputExam, {
     includeAnswers: false,
   });
 

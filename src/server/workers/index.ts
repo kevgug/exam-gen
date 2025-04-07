@@ -1,6 +1,5 @@
 import { fork } from "node:child_process";
 import { DATA_DIR, FileMetadata, multistore } from "../config";
-import { Id } from "../../shared/types/common";
 import { Exam } from "../../shared/types/exam";
 import path from "path";
 import { PDFService } from "../core/services/pdf";
@@ -12,7 +11,7 @@ export class ExamProcessingWorker {
     this.store = store;
   }
 
-  async start(id: Id) {
+  async start(id: string) {
     console.log(`starting exam processing worker for ${id}`);
     const file: FileMetadata = await this.store.file.get(id);
 
@@ -28,7 +27,7 @@ export class ExamProcessingWorker {
 
       this.store.obj.set(id, exam);
       console.log(
-        `finished exam processing for ${id} after ${exam.questionGroups.length} questions. exiting worker...`,
+        `finished exam processing for ${id} after ${exam.parts.length} parts. exiting worker...`,
       );
     });
   }
@@ -41,7 +40,7 @@ export class ExamGenerationWorker {
     this.store = store;
   }
 
-  async start(ids: Id[], id: Id) {
+  async start(ids: string[], id: string) {
     console.log(`starting exam generation worker with ${ids.join(", ")}`);
 
     // TODO: check to make sure ids were correct

@@ -5,6 +5,11 @@ const mistralClient = new Mistral({
   apiKey: process.env.MISTRAL_API_KEY ?? "",
 });
 
+export type CombinedMarkdown = {
+  mdStr: string;
+  imgsById: Record<string, string>;
+};
+
 /**
  * Service for Optical Character Recognition (OCR) operations.
  * Handles PDF text extraction using Mistral's OCR API and
@@ -14,17 +19,17 @@ export class OcrService {
   /**
    * Replaces image placeholders in markdown with base64 representations.
    * @param mdString - Markdown string containing image placeholders
-   * @param imgRecord - Record mapping image names to base64 strings
+   * @param imgsById - Record mapping image names to base64 strings
    * @returns Markdown with replaced image references
    */
-  private static replaceImagesInMd({
+  public static fillImagesInMd({
     mdString,
-    imgRecord: imageMap,
+    imgsById,
   }: {
     mdString: string;
-    imgRecord: Record<string, string>;
+    imgsById: Record<string, string>;
   }): string {
-    for (const [imgName, base64] of Object.entries(imageMap)) {
+    for (const [imgName, base64] of Object.entries(imgsById)) {
       mdString = mdString.replace(
         `![${imgName}](${imgName})`,
         `![${imgName}](${base64})`,
@@ -33,31 +38,47 @@ export class OcrService {
     return mdString;
   }
 
-  /**
-   * Combines markdown content from all pages in an OCR response.
-   * Processes embedded images and incorporates them into the markdown.
-   * @param ocrResponse - OCR response containing pages with markdown and images
-   * @returns Combined markdown string with all content and embedded images
-   */
-  private static getCombinedMd(ocrResponse: OCRResponse): string {
+  // /**
+  //  * Combines markdown content from all pages in an OCR response.
+  //  * Processes embedded images and incorporates them into the markdown.
+  //  * @param ocrResponse - OCR response containing pages with markdown and images
+  //  * @returns Combined markdown string with all content and embedded images
+  //  */
+  // private static getCombinedMd(ocrResponse: OCRResponse): string {
+  //   const markdowns: string[] = [];
+
+  //   for (const page of ocrResponse.pages) {
+  //     let imgData: Record<string, string> = {};
+  //     for (const img of page.images) {
+  //       imgData[img.id] = img.imageBase64 ?? "";
+  //     }
+
+  //     // replace img placeholders with actual imgs
+  //     markdowns.push(
+  //       this.replaceImagesInMd({
+  //         mdString: page.markdown,
+  //         imgRecord: imgData,
+  //       }),
+  //     );
+  //   }
+
+  //   return markdowns.join("\n\n");
+  // }
+
+  private static getCombinedMd(ocrResponse: OCRResponse): CombinedMarkdown {
     const markdowns: string[] = [];
+    let imgData: Record<string, string> = {};
 
     for (const page of ocrResponse.pages) {
-      let imgData: Record<string, string> = {};
       for (const img of page.images) {
         imgData[img.id] = img.imageBase64 ?? "";
       }
 
       // replace img placeholders with actual imgs
-      markdowns.push(
-        this.replaceImagesInMd({
-          mdString: page.markdown,
-          imgRecord: imgData,
-        }),
-      );
+      markdowns.push(page.markdown);
     }
 
-    return markdowns.join("\n\n");
+    return { mdStr: markdowns.join("\n\n"), imgsById: imgData };
   }
 
   /**
@@ -74,7 +95,7 @@ export class OcrService {
   }: {
     pdfName: string;
     pdfBuffer: Buffer;
-  }): Promise<String> {
+  }): Promise<CombinedMarkdown> {
     // Upload PDF to Mistral
     const uploadedPdf = await mistralClient.files.upload({
       file: {
