@@ -6,18 +6,34 @@ import path from "path";
 
 export type PromptName =
   | "ExamCore_getFromMarkdown"
-  | "OcrService_generateImgDescription";
+  | "OcrService_reviseCombinedMd";
 export type SchemaInfo = {
   schemaName: string;
   schemaDescription: string;
   schema: Schema;
 };
 
+export class Prompt {
+  private _text: string;
+
+  constructor(text: string) {
+    this._text = text;
+  }
+
+  get text() {
+    return this._text;
+  }
+
+  fillVar(varName: string, fillValue: string): Prompt {
+    return new Prompt(this.text.replace(`{{${varName}\\}}`, fillValue));
+  }
+}
+
 export class PromptService {
-  public static async sysPrompt(promptName: PromptName): Promise<string> {
-    return (
-      await readFile(path.join(PROMPT_DIR, `${promptName}.md`))
-    ).toString();
+  public static async system(promptName: PromptName): Promise<Prompt> {
+    return new Prompt(
+      (await readFile(path.join(PROMPT_DIR, `${promptName}.md`))).toString(),
+    );
   }
 
   public static schemaInfo(promptName: PromptName): SchemaInfo {

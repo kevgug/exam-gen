@@ -9,10 +9,10 @@ export class ExamCore {
   public static async getFromMarkdown(mdStr: string): Promise<Exam> {
     // Invoke LLM
     const schemaInfo = PromptService.schemaInfo("ExamCore_getFromMarkdown");
-    const sysPrompt = await PromptService.sysPrompt("ExamCore_getFromMarkdown");
+    const system = await PromptService.system("ExamCore_getFromMarkdown");
     const { object } = await generateObject({
       model: openai("o3-mini"),
-      system: sysPrompt,
+      system: system.text,
       ...schemaInfo,
       prompt: mdStr,
     });
