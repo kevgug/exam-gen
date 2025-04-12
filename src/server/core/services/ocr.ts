@@ -2,11 +2,12 @@ import { Mistral } from "@mistralai/mistralai";
 import { OCRResponse } from "@mistralai/mistralai/models/components";
 import { PromptService } from "./prompt";
 import { generateText } from "ai";
-import { anthropic, AnthropicProviderOptions } from "@ai-sdk/anthropic";
+import Anthropic from "@anthropic-ai/sdk";
 
 const mistralClient = new Mistral({
   apiKey: process.env.MISTRAL_API_KEY ?? "",
 });
+const anthropicClient = new Anthropic();
 
 export type CombinedMarkdown = {
   str: string;
@@ -56,30 +57,52 @@ export class OcrService {
     md: CombinedMarkdown,
     pdfBuffer: Buffer,
   ): Promise<CombinedMarkdown> {
-    const { text, reasoning } = await generateText({
-      model: anthropic("claude-3-7-sonnet-20250219"),
+    const stream = anthropicClient.messages.stream({
+      model: "claude-3-7-sonnet-20250219",
+      max_tokens: 30000,
+      temperature: 1,
       system: (
         await PromptService.system("OcrService_reviseCombinedMd")
       ).fillVar("OCR_TRANSCRIPTION", md.str).text,
-      providerOptions: {
-        thinking: {
-          type: "enabled",
-          budgetTokens: 10000,
-        },
-      } satisfies AnthropicProviderOptions,
       messages: [
         {
           role: "user",
           content: [
             {
-              type: "file",
-              mimeType: "application/pdf",
-              data: pdfBuffer,
+              type: "document",
+              source: {
+                type: "base64",
+                media_type: "application/pdf",
+                data: pdfBuffer.toString("base64"),
+              },
             },
           ],
         },
       ],
+      thinking: {
+        type: "enabled",
+        budget_tokens: 10000,
+      },
     });
+
+    let reasoning = "";
+    let text = "";
+    for await (const event of stream) {
+      if (event.type === "content_block_start") {
+        console.log(`\nStarting ${event.content_block.type} block...`);
+      } else if (event.type === "content_block_delta") {
+        if (event.delta.type === "thinking_delta") {
+          reasoning += event.delta.thinking;
+          console.log(`Thinking: ${event.delta.thinking}`);
+        } else if (event.delta.type === "text_delta") {
+          text += event.delta.text;
+          console.log(`Response: ${event.delta.text}`);
+        }
+      } else if (event.type === "content_block_stop") {
+        console.log("\nBlock complete.");
+      }
+    }
+
     console.log("reviseCombinedMd reasoning:\n", reasoning);
     return {
       ...md,
@@ -132,7 +155,6 @@ export class OcrService {
     // First markdown exam produced
     console.log("ocrToCombinedMd");
     const md0 = this.ocrToCombinedMd(ocrResponse);
-    console.log("md0:\n", md0);
     // Revise markdown
     console.log("revise md");
     const md1 = await this.reviseCombinedMd(md0, pdfBuffer);
