@@ -21,16 +21,17 @@ const PDF_NAME = "paper2";
     pdfName: inputPdf.filename,
     pdfBuffer: await readFile(inputPdf.path),
   });
-  const { mdStr: inputMdStr, imgsById: inputImgsById } = inputCombinedMd;
-  await writeFile(path.join(DATA_DIR, "file", "test.md"), inputMdStr);
+  await writeFile(
+    path.join(DATA_DIR, "file", "test.md"),
+    OcrService.fillImagesInMd(inputCombinedMd, false),
+  );
   await writeFile(
     path.join(DATA_DIR, "file", "test-imgs.md"),
-    OcrService.fillImagesInMd({
-      mdString: inputMdStr,
-      imgsById: inputImgsById,
-    }),
+    OcrService.fillImagesInMd(inputCombinedMd, true),
   );
-  const inputExam = await ExamCore.getFromMarkdown(inputMdStr);
+  const inputExam = await ExamCore.getFromMarkdown(
+    OcrService.fillImagesInMd(inputCombinedMd, false),
+  );
   // const inputExam: Exam = {
   //   generated: true,
   //   parts: JSON.parse(

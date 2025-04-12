@@ -1,5 +1,6 @@
 import { Mistral } from "@mistralai/mistralai";
 import { OCRResponse } from "@mistralai/mistralai/models/components";
+import { PromptService } from "./prompt";
 
 const mistralClient = new Mistral({
   apiKey: process.env.MISTRAL_API_KEY ?? "",
@@ -8,6 +9,7 @@ const mistralClient = new Mistral({
 export type CombinedMarkdown = {
   mdStr: string;
   imgsById: Record<string, string>;
+  imgDescriptionsById: Record<string, string>;
 };
 
 /**
@@ -22,63 +24,78 @@ export class OcrService {
    * @param imgsById - Record mapping image names to base64 strings
    * @returns Markdown with replaced image references
    */
-  public static fillImagesInMd({
-    mdString,
-    imgsById,
-  }: {
-    mdString: string;
-    imgsById: Record<string, string>;
-  }): string {
-    for (const [imgName, base64] of Object.entries(imgsById)) {
-      mdString = mdString.replace(
-        `![${imgName}](${imgName})`,
-        `![${imgName}](${base64})`,
-      );
+  public static fillImagesInMd(
+    combinedMd: CombinedMarkdown,
+    replaceImgs: boolean,
+  ): string {
+    let combinedMdStr = combinedMd.mdStr;
+    if (replaceImgs) {
+      for (const imgName of Object.keys(combinedMd.imgsById)) {
+        const base64 = combinedMd.imgsById[imgName];
+        const description = combinedMd.imgDescriptionsById[imgName];
+        combinedMdStr = combinedMdStr.replace(
+          `![${imgName}](${imgName})`,
+          `![${description}](${base64})`,
+        );
+      }
+    } else {
+      for (const [imgName, description] of Object.entries(
+        combinedMd.imgDescriptionsById,
+      )) {
+        combinedMdStr = combinedMdStr.replace(
+          `![${imgName}](${imgName})`,
+          `![${description}](${imgName})`,
+        );
+      }
     }
-    return mdString;
+    return combinedMdStr;
   }
 
-  // /**
-  //  * Combines markdown content from all pages in an OCR response.
-  //  * Processes embedded images and incorporates them into the markdown.
-  //  * @param ocrResponse - OCR response containing pages with markdown and images
-  //  * @returns Combined markdown string with all content and embedded images
-  //  */
-  // private static getCombinedMd(ocrResponse: OCRResponse): string {
-  //   const markdowns: string[] = [];
+  private static async generateImgDescription(
+    base64Img: string,
+  ): Promise<string> {
+    const response = await mistralClient.chat.complete({
+      model: "pixtral-12b",
+      messages: [
+        {
+          role: "system",
+          content: [
+            {
+              type: "text",
+              text: await PromptService.sysPrompt(
+                "OcrService_generateImgDescription",
+              ),
+            },
+          ],
+        },
+        {
+          role: "user",
+          content: [{ type: "image_url", imageUrl: base64Img }],
+        },
+      ],
+    });
+    return response.object;
+  }
 
-  //   for (const page of ocrResponse.pages) {
-  //     let imgData: Record<string, string> = {};
-  //     for (const img of page.images) {
-  //       imgData[img.id] = img.imageBase64 ?? "";
-  //     }
-
-  //     // replace img placeholders with actual imgs
-  //     markdowns.push(
-  //       this.replaceImagesInMd({
-  //         mdString: page.markdown,
-  //         imgRecord: imgData,
-  //       }),
-  //     );
-  //   }
-
-  //   return markdowns.join("\n\n");
-  // }
-
-  private static getCombinedMd(ocrResponse: OCRResponse): CombinedMarkdown {
+  private static async getCombinedMd(
+    ocrResponse: OCRResponse,
+  ): Promise<CombinedMarkdown> {
     const markdowns: string[] = [];
-    let imgData: Record<string, string> = {};
+    let imgsById: Record<string, string> = {};
+    let imgDescriptionsById: Record<string, string> = {};
 
     for (const page of ocrResponse.pages) {
       for (const img of page.images) {
-        imgData[img.id] = img.imageBase64 ?? "";
+        imgsById[img.id] = img.imageBase64 ?? "";
+        imgDescriptionsById[img.id] = await this.generateImgDescription(
+          img.imageBase64 ?? "",
+        );
       }
-
       // replace img placeholders with actual imgs
       markdowns.push(page.markdown);
     }
 
-    return { mdStr: markdowns.join("\n\n"), imgsById: imgData };
+    return { mdStr: markdowns.join("\n\n"), imgsById, imgDescriptionsById };
   }
 
   /**
