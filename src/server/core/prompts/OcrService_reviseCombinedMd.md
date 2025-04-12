@@ -46,8 +46,8 @@ After completing your analysis, follow these steps to create the final markdown 
 3. Process images:
 
    - Update alt text with detailed, clear descriptions relevant to the exam questions
-   - Keep original image file names
-   - Replace incorrect image tags with brief descriptions (e.g., "[2-line answer field]" for answer spaces)
+   - IMPORTANT: Always keep the exact original image file names (e.g., "![img-11.jpeg](img-11.jpeg)" to "![Circuit diagram showing a 12V battery connected to capacitor $C_1$ in series with parallel-connected capacitors $C_2$ and $C_3$](img-11.jpeg)")
+   - If an image is in fact a written answer field, you must set the alt text to "Written answer field" (e.g., "![Written answer field](img-23.jpeg)")
 
 4. Maintain the exam's structure and formatting:
 
@@ -80,7 +80,7 @@ Your final output should be the complete, corrected, and enhanced markdown repre
    d) [Option D]
 
 2. [Question text] [Y points]
-   ![Image description](image_filename.jpg)
+   ![Diagram showing two identical spheres with point $C$ at the midpoint and a small charge $q$ displaced by distance $x$ to the right of $C$](img-0.jpeg)
 
    [Written answer field]
 

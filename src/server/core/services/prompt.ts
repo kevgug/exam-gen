@@ -6,6 +6,7 @@ import path from "path";
 
 export type PromptName =
   | "ExamCore_getFromMarkdown"
+  | "OcrService_generateImgAlts"
   | "OcrService_reviseCombinedMd";
 export type SchemaInfo = {
   schemaName: string;
@@ -76,6 +77,19 @@ export class PromptService {
           schemaDescription:
             "Hierarchical exam representation with nested parts.",
           schema: zodSchema(Exam),
+        };
+      case "OcrService_generateImgAlts":
+        const ImgDescriptions = z.array(
+          z.object({
+            description: z.string(),
+            isValid: z.boolean(),
+          }),
+        );
+
+        return {
+          schemaName: "imgAltDescriptions",
+          schemaDescription: "Alt descriptions for an array of exam images.",
+          schema: zodSchema(ImgDescriptions),
         };
       default:
         throw new Error(
