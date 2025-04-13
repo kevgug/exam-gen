@@ -1,11 +1,8 @@
 import { Mistral } from "@mistralai/mistralai";
 import { OCRResponse } from "@mistralai/mistralai/models/components";
 import { PromptService } from "./prompt";
-import { generateText } from "ai";
 import Anthropic from "@anthropic-ai/sdk";
 import { ContentBlockParam } from "@anthropic-ai/sdk/resources/index.mjs";
-import { writeFile } from "node:fs/promises";
-import path from "node:path";
 
 const mistralClient = new Mistral({
   apiKey: process.env.MISTRAL_API_KEY ?? "",
@@ -122,28 +119,35 @@ export class OcrService {
    * Fill in alts into image tags. Also remove invalid images from the document.
    */
   private static fillAltsInMd(
-    md: CombinedMarkdown,
+    oldMd: CombinedMarkdown,
     alts: ImgAlt[],
   ): CombinedMarkdown {
-    let mdStr = md.str;
-    const orderedImgNames = this.getOrderedImgNames(md.imgsById);
+    let newMdStr = oldMd.str;
+    const newImgsById: Record<string, string> = {};
+
+    const orderedImgNames = this.getOrderedImgNames(oldMd.imgsById);
+    let validIndex = 0;
     for (let i = 0; i < orderedImgNames.length; i++) {
       const { alt, isValid } = alts[i];
       const imgName = orderedImgNames[i];
       if (isValid) {
         // Fill alt text
-        mdStr = mdStr.replace(
+        newMdStr = newMdStr.replace(
           `![${imgName}](${imgName})`,
-          `![${alt}](${imgName})`,
+          `![${alt}](img-${validIndex}.jpeg)`,
         );
+        // Rebuild imgsById incrementing by 1 to account for deleted img tags...
+        newImgsById[`img-${validIndex}.jpeg`] = oldMd.imgsById[imgName];
+        validIndex++;
       } else {
         // Delete img tag
-        mdStr = mdStr.replace(`![${imgName}](${imgName})`, "");
+        newMdStr = newMdStr.replace(`![${imgName}](${imgName})`, "");
       }
     }
+
     return {
-      ...md,
-      str: mdStr,
+      str: newMdStr,
+      imgsById: newImgsById,
     };
   }
 
