@@ -5,9 +5,9 @@ import { PROMPT_DIR } from "../../config";
 import path from "path";
 
 export type PromptName =
-  | "ExamCore_getFromMarkdown"
+  | "ExamCore_markdownToJson"
   | "OcrService_generateImgAlts"
-  | "OcrService_reviseCombinedMd";
+  | "OcrService_reviseOcrMarkdown";
 export type SchemaInfo = {
   schemaName: string;
   schemaDescription: string;
@@ -39,7 +39,7 @@ export class PromptService {
 
   public static schemaInfo(promptName: PromptName): SchemaInfo {
     switch (promptName) {
-      case "ExamCore_getFromMarkdown":
+      case "ExamCore_markdownToJson":
         const ExamPartChunk = z.object({
           chunkType: z.enum(["text", "table", "image"]),
           chunkValue: z.string(),

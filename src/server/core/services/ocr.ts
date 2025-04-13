@@ -156,7 +156,7 @@ export class OcrService {
       max_tokens: 30000,
       temperature: 1,
       system: (
-        await PromptService.system("OcrService_reviseCombinedMd")
+        await PromptService.system("OcrService_reviseOcrMarkdown")
       ).fillVar("OCR_TRANSCRIPTION", md.str).text,
       messages: [
         {
@@ -255,7 +255,6 @@ export class OcrService {
     const alts = await this.generateImgAlts(md0.imgsById);
     const md1 = this.fillAltsInMd(md0, alts);
     console.log("md1:\n", md1);
-    return md1;
     // Revise markdown
     console.log("revise md");
     const md2 = await this.reviseCombinedMd(md1, pdfBuffer);

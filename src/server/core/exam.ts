@@ -8,8 +8,8 @@ import { PromptService } from "./services/prompt";
 export class ExamCore {
   public static async getFromMarkdown(mdStr: string): Promise<Exam> {
     // Invoke LLM
-    const schemaInfo = PromptService.schemaInfo("ExamCore_getFromMarkdown");
-    const system = await PromptService.system("ExamCore_getFromMarkdown");
+    const schemaInfo = PromptService.schemaInfo("ExamCore_markdownToJson");
+    const system = await PromptService.system("ExamCore_markdownToJson");
     const { object } = await generateObject({
       model: openai("o3-mini"),
       system: system.text,
