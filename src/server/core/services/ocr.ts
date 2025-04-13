@@ -1,13 +1,22 @@
 import { Mistral } from "@mistralai/mistralai";
 import { OCRResponse } from "@mistralai/mistralai/models/components";
+import { PromptService } from "./prompt";
+import Anthropic from "@anthropic-ai/sdk";
+import { ContentBlockParam } from "@anthropic-ai/sdk/resources/index.mjs";
 
 const mistralClient = new Mistral({
   apiKey: process.env.MISTRAL_API_KEY ?? "",
 });
+const anthropicClient = new Anthropic();
 
 export type CombinedMarkdown = {
-  mdStr: string;
+  str: string;
   imgsById: Record<string, string>;
+};
+
+export type ImgAlt = {
+  alt: string;
+  isValid: boolean;
 };
 
 /**
@@ -22,63 +31,181 @@ export class OcrService {
    * @param imgsById - Record mapping image names to base64 strings
    * @returns Markdown with replaced image references
    */
-  public static fillImagesInMd({
-    mdString,
-    imgsById,
-  }: {
-    mdString: string;
-    imgsById: Record<string, string>;
-  }): string {
-    for (const [imgName, base64] of Object.entries(imgsById)) {
-      mdString = mdString.replace(
-        `![${imgName}](${imgName})`,
-        `![${imgName}](${base64})`,
-      );
+  public static fillImagesInMd(md: CombinedMarkdown): string {
+    let combinedMdStr = md.str;
+    for (const imgName of Object.keys(md.imgsById)) {
+      const base64 = md.imgsById[imgName];
+      // Create a regex to match ![any alt text](imgName)
+      const regex = new RegExp(`!\\[(.*?)\\]\\(${imgName}\\)`, "g");
+      // Replace with ![same alt text](base64)
+      combinedMdStr = combinedMdStr.replace(regex, `![$1](${base64})`);
     }
-    return mdString;
+    return combinedMdStr;
   }
 
-  // /**
-  //  * Combines markdown content from all pages in an OCR response.
-  //  * Processes embedded images and incorporates them into the markdown.
-  //  * @param ocrResponse - OCR response containing pages with markdown and images
-  //  * @returns Combined markdown string with all content and embedded images
-  //  */
-  // private static getCombinedMd(ocrResponse: OCRResponse): string {
-  //   const markdowns: string[] = [];
-
-  //   for (const page of ocrResponse.pages) {
-  //     let imgData: Record<string, string> = {};
-  //     for (const img of page.images) {
-  //       imgData[img.id] = img.imageBase64 ?? "";
-  //     }
-
-  //     // replace img placeholders with actual imgs
-  //     markdowns.push(
-  //       this.replaceImagesInMd({
-  //         mdString: page.markdown,
-  //         imgRecord: imgData,
-  //       }),
-  //     );
-  //   }
-
-  //   return markdowns.join("\n\n");
-  // }
-
-  private static getCombinedMd(ocrResponse: OCRResponse): CombinedMarkdown {
+  private static ocrToCombinedMd(ocrResponse: OCRResponse): CombinedMarkdown {
     const markdowns: string[] = [];
-    let imgData: Record<string, string> = {};
+    let imgsById: Record<string, string> = {};
 
     for (const page of ocrResponse.pages) {
       for (const img of page.images) {
-        imgData[img.id] = img.imageBase64 ?? "";
+        imgsById[img.id] = img.imageBase64 ?? "";
       }
-
       // replace img placeholders with actual imgs
       markdowns.push(page.markdown);
     }
 
-    return { mdStr: markdowns.join("\n\n"), imgsById: imgData };
+    return { str: markdowns.join("\n\n"), imgsById };
+  }
+
+  private static getOrderedImgNames(
+    imgsById: Record<string, string>,
+  ): string[] {
+    return Object.keys(imgsById).sort((a, b) => {
+      // Extract the number part from the filename
+      const numA = parseInt(a.match(/img-(\d+)\.jpeg/)?.[1] ?? "0");
+      const numB = parseInt(b.match(/img-(\d+)\.jpeg/)?.[1] ?? "0");
+
+      // Compare the extracted numbers
+      return numA - numB;
+    });
+  }
+
+  private static async generateImgAlts(
+    imgsById: Record<string, string>,
+  ): Promise<ImgAlt[]> {
+    const stream = anthropicClient.messages.stream({
+      model: "claude-3-7-sonnet-20250219",
+      max_tokens: 50000,
+      temperature: 1,
+      system: (await PromptService.system("OcrService_generateImgAlts")).text,
+      messages: [
+        {
+          role: "user",
+          content: this.getOrderedImgNames(imgsById).map((imgName) => {
+            return {
+              type: "image",
+              source: {
+                type: "base64",
+                media_type: "image/jpeg",
+                data: imgsById[imgName].replace("data:image/jpeg;base64,", ""),
+              },
+            } as ContentBlockParam;
+          }),
+        },
+      ],
+    });
+
+    let text = "";
+    for await (const event of stream) {
+      if (
+        event.type === "content_block_delta" &&
+        event.delta.type === "text_delta"
+      ) {
+        text += event.delta.text;
+      }
+    }
+
+    let alts: ImgAlt[] = [];
+    try {
+      alts = JSON.parse(text.trim()) as ImgAlt[];
+    } catch (e) {
+      console.error(e);
+    }
+
+    return alts;
+  }
+  /**
+   * Fill in alts into image tags. Also remove invalid images from the document.
+   */
+  private static fillAltsInMd(
+    oldMd: CombinedMarkdown,
+    alts: ImgAlt[],
+  ): CombinedMarkdown {
+    let newMdStr = oldMd.str;
+    const newImgsById: Record<string, string> = {};
+
+    const orderedImgNames = this.getOrderedImgNames(oldMd.imgsById);
+    let validIndex = 0;
+    for (let i = 0; i < orderedImgNames.length; i++) {
+      const { alt, isValid } = alts[i];
+      const imgName = orderedImgNames[i];
+      if (isValid) {
+        // Fill alt text
+        newMdStr = newMdStr.replace(
+          `![${imgName}](${imgName})`,
+          `![${alt}](img-${validIndex}.jpeg)`,
+        );
+        // Rebuild imgsById incrementing by 1 to account for deleted img tags...
+        newImgsById[`img-${validIndex}.jpeg`] = oldMd.imgsById[imgName];
+        validIndex++;
+      } else {
+        // Delete img tag
+        newMdStr = newMdStr.replace(`![${imgName}](${imgName})`, "");
+      }
+    }
+
+    return {
+      str: newMdStr,
+      imgsById: newImgsById,
+    };
+  }
+
+  private static async reviseCombinedMd(
+    md: CombinedMarkdown,
+    pdfBuffer: Buffer,
+  ): Promise<CombinedMarkdown> {
+    const stream = anthropicClient.messages.stream({
+      model: "claude-3-7-sonnet-20250219",
+      max_tokens: 30000,
+      temperature: 1,
+      system: (
+        await PromptService.system("OcrService_reviseOcrMarkdown")
+      ).fillVar("OCR_TRANSCRIPTION", md.str).text,
+      messages: [
+        {
+          role: "user",
+          content: [
+            {
+              type: "document",
+              source: {
+                type: "base64",
+                media_type: "application/pdf",
+                data: pdfBuffer.toString("base64"),
+              },
+            },
+          ],
+        },
+      ],
+      thinking: {
+        type: "enabled",
+        budget_tokens: 10000,
+      },
+    });
+
+    let reasoning = "";
+    let text = "";
+    for await (const event of stream) {
+      if (event.type === "content_block_start") {
+        console.log(`\nStarting ${event.content_block.type} block...`);
+      } else if (event.type === "content_block_delta") {
+        if (event.delta.type === "thinking_delta") {
+          reasoning += event.delta.thinking;
+          console.log(`Thinking: ${event.delta.thinking}`);
+        } else if (event.delta.type === "text_delta") {
+          text += event.delta.text;
+          console.log(`Response: ${event.delta.text}`);
+        }
+      } else if (event.type === "content_block_stop") {
+        console.log("\nBlock complete.");
+      }
+    }
+
+    console.log("reviseCombinedMd reasoning:\n", reasoning);
+    return {
+      ...md,
+      str: text,
+    } as CombinedMarkdown;
   }
 
   /**
@@ -123,8 +250,21 @@ export class OcrService {
       throw Error("no pages processed by mistral ocr");
     }
 
-    // Return combined markdown
-    return this.getCombinedMd(ocrResponse);
+    // First markdown exam produced
+    console.log("ocrToCombinedMd");
+    const md0 = this.ocrToCombinedMd(ocrResponse);
+    console.log("md0:\n", md0);
+    // Fill image alts
+    console.log("generate alts");
+    const alts = await this.generateImgAlts(md0.imgsById);
+    const md1 = this.fillAltsInMd(md0, alts);
+    console.log("md1:\n", md1);
+    // Revise markdown
+    console.log("revise md");
+    const md2 = await this.reviseCombinedMd(md1, pdfBuffer);
+    console.log("md2:\n", md2);
+
+    return md2;
   }
 
   /**

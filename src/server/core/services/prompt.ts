@@ -4,23 +4,42 @@ import { readFile } from "fs/promises";
 import { PROMPT_DIR } from "../../config";
 import path from "path";
 
-export type PromptName = "ExamCore_getFromMarkdown";
+export type PromptName =
+  | "ExamCore_markdownToJson"
+  | "OcrService_generateImgAlts"
+  | "OcrService_reviseOcrMarkdown";
 export type SchemaInfo = {
   schemaName: string;
   schemaDescription: string;
   schema: Schema;
 };
 
+export class Prompt {
+  private _text: string;
+
+  constructor(text: string) {
+    this._text = text;
+  }
+
+  get text() {
+    return this._text;
+  }
+
+  fillVar(varName: string, fillValue: string): Prompt {
+    return new Prompt(this.text.replace(`{{${varName}\\}}`, fillValue));
+  }
+}
+
 export class PromptService {
-  public static async sysPrompt(promptName: PromptName): Promise<string> {
-    return (
-      await readFile(path.join(PROMPT_DIR, `${promptName}.md`))
-    ).toString();
+  public static async system(promptName: PromptName): Promise<Prompt> {
+    return new Prompt(
+      (await readFile(path.join(PROMPT_DIR, `${promptName}.md`))).toString(),
+    );
   }
 
   public static schemaInfo(promptName: PromptName): SchemaInfo {
     switch (promptName) {
-      case "ExamCore_getFromMarkdown":
+      case "ExamCore_markdownToJson":
         const ExamPartChunk = z.object({
           chunkType: z.enum(["text", "table", "image"]),
           chunkValue: z.string(),
@@ -59,6 +78,19 @@ export class PromptService {
             "Hierarchical exam representation with nested parts.",
           schema: zodSchema(Exam),
         };
+      case "OcrService_generateImgAlts":
+        const ImgDescriptions = z.array(
+          z.object({
+            description: z.string(),
+            isValid: z.boolean(),
+          }),
+        );
+
+        return {
+          schemaName: "imgAltDescriptions",
+          schemaDescription: "Alt descriptions for an array of exam images.",
+          schema: zodSchema(ImgDescriptions),
+        };
       default:
         throw new Error(
           `prompt '${promptName}' does not have an output schema`,
@@ -66,87 +98,3 @@ export class PromptService {
     }
   }
 }
-
-/*
-jsonSchema<Exam>({
-            type: "object",
-            properties: {
-              parts: {
-                type: "array",
-                items: {
-                  type: "object",
-                  properties: {
-                    partName: { type: "string" },
-                    partLevel: { type: "number" },
-                    content: {
-                      type: "object",
-                      properties: {
-                        setupChunks: {
-                          anyOf: [
-                            { $ref: "#/$defs/ExamPartChunk" },
-                            { type: "null" },
-                          ],
-                        },
-                        task: { type: ["string", "null"] },
-                      },
-                      required: ["setupChunks", "task"],
-                      additionalProperties: false,
-                    },
-                    partType: {
-                      type: "string",
-                      enum: ["parent", "question"],
-                    },
-                    questionType: {
-                      anyOf: [
-                        {
-                          type: "string",
-                          enum: ["write", "multipleChoice", "table", "sketch"],
-                        },
-                        { type: "null" },
-                      ],
-                    },
-                    writeIsComputational: { type: ["boolean", "null"] },
-                    writeNumAnswersExpected: { type: ["number", "null"] },
-                    multipleChoiceOptionChunks: {
-                      type: ["array", "null"],
-                      items: { $ref: "#/$defs/ExamPartChunk" },
-                    },
-                    tableBaseMarkdown: { type: ["string", "null"] },
-                    sketchBaseImage: { type: ["string", "null"] },
-                    pointsAvailable: { type: ["number", "null"] },
-                  },
-                  required: [
-                    "partName",
-                    "partLevel",
-                    "content",
-                    "partType",
-                    "questionType",
-                    "writeIsComputational",
-                    "writeNumAnswersExpected",
-                    "multipleChoiceOptionChunks",
-                    "tableBaseMarkdown",
-                    "sketchBaseImage",
-                    "pointsAvailable",
-                  ],
-                  additionalProperties: false,
-                },
-              },
-            },
-            required: ["parts"],
-            additionalProperties: false,
-            $defs: {
-              ExamPartChunk: {
-                type: "object",
-                properties: {
-                  chunkType: {
-                    type: "string",
-                    enum: ["text", "table", "image"],
-                  },
-                  chunkValue: { type: "string" },
-                },
-                required: ["chunkType", "chunkValue"],
-                additionalProperties: false,
-              },
-            },
-          })
-*/

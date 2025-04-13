@@ -13,34 +13,37 @@ const PDF_NAME = "paper2";
 (async () => {
   console.log("test.ts start.");
 
+  console.log(0);
   const inputPdf: FileMetadata = {
     filename: `${PDF_NAME}.pdf`,
     path: path.join(DATA_DIR, "file", `${PDF_NAME}.pdf`),
   };
-  const inputCombinedMd = await OcrService.extractTextFromPdf({
+  console.log("await inputMd...");
+  const inputMd = await OcrService.extractTextFromPdf({
     pdfName: inputPdf.filename,
     pdfBuffer: await readFile(inputPdf.path),
   });
-  const { mdStr: inputMdStr, imgsById: inputImgsById } = inputCombinedMd;
-  await writeFile(path.join(DATA_DIR, "file", "test.md"), inputMdStr);
+  console.log("await writeFile test.md...");
+  await writeFile(path.join(DATA_DIR, "file", "test.md"), inputMd.str);
+  console.log("await writeFile test-imgs.md");
   await writeFile(
     path.join(DATA_DIR, "file", "test-imgs.md"),
-    OcrService.fillImagesInMd({
-      mdString: inputMdStr,
-      imgsById: inputImgsById,
-    }),
+    OcrService.fillImagesInMd(inputMd),
   );
-  const inputExam = await ExamCore.getFromMarkdown(inputMdStr);
+  console.log("await md -> exam");
+  const inputExam = await ExamCore.getFromMarkdown(inputMd.str);
   // const inputExam: Exam = {
   //   generated: true,
   //   parts: JSON.parse(
   //     (await readFile(path.join(DATA_DIR, "file", "test.json"))).toString(),
   //   ),
   // };
+  console.log("await writeFile test.json");
   await writeFile(
     path.join(DATA_DIR, "file", "test.json"),
     JSON.stringify(inputExam),
   );
+  console.log("done all.");
   return;
 
   const generatedPdf: FileMetadata = {

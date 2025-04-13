@@ -254,7 +254,7 @@ Answers written on this page will not be marked.
 6. Set write_numAnswersExpected ONLY when question explicitly states a quantity (e.g., "State **two** reasons...") and write as cloze in the text chunk (e.g. "State {{numAnswersExpected}} reasons..."); otherwise it must be null
 7. Include all schema properties even if null
 8. For tables, use chunkType: "table" and include the markdown table in chunkValue
-9. Ensure every question and subpart in the exam is captured, including those with non-standard formatting. Parse sequentially from top to bottom, creating a separate part entry for each distinct question component identified by numbering or lettering (e.g., 1, 2, a, b, i, ii, etc.).
+9. Ensure every question and subpart in the exam is captured, including those with non-standard formatting. Parse sequentially from top to bottom, creating a separate part entry for each distinct question component identified by numbering or lettering for partName (e.g., "1", "2", "a", "b", "i", "ii", etc.).
 
 ## Task
 
