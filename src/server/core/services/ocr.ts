@@ -4,6 +4,8 @@ import { PromptService } from "./prompt";
 import { generateText } from "ai";
 import Anthropic from "@anthropic-ai/sdk";
 import { ContentBlockParam } from "@anthropic-ai/sdk/resources/index.mjs";
+import { writeFile } from "node:fs/promises";
+import path from "node:path";
 
 const mistralClient = new Mistral({
   apiKey: process.env.MISTRAL_API_KEY ?? "",
@@ -72,11 +74,10 @@ export class OcrService {
     });
   }
 
-  // todo stream!
   private static async generateImgAlts(
     imgsById: Record<string, string>,
   ): Promise<ImgAlt[]> {
-    const msg = await anthropicClient.messages.create({
+    const stream = anthropicClient.messages.stream({
       model: "claude-3-7-sonnet-20250219",
       max_tokens: 50000,
       temperature: 1,
@@ -90,25 +91,32 @@ export class OcrService {
               source: {
                 type: "base64",
                 media_type: "image/jpeg",
-                data: imgsById[imgName],
+                data: imgsById[imgName].replace("data:image/jpeg;base64,", ""),
               },
             } as ContentBlockParam;
           }),
         },
       ],
     });
-    let result: ImgAlt[] = [];
-    try {
-      const content0 = msg.content[0];
-      if (content0.type !== "text") {
-        throw new Error();
+
+    let text = "";
+    for await (const event of stream) {
+      if (
+        event.type === "content_block_delta" &&
+        event.delta.type === "text_delta"
+      ) {
+        text += event.delta.text;
       }
-      result = JSON.parse(content0.text.trim()) as ImgAlt[];
+    }
+
+    let alts: ImgAlt[] = [];
+    try {
+      alts = JSON.parse(text.trim()) as ImgAlt[];
     } catch (e) {
       console.error(e);
     }
 
-    return result;
+    return alts;
   }
   /**
    * Fill in alts into image tags. Also remove invalid images from the document.
@@ -247,6 +255,7 @@ export class OcrService {
     const alts = await this.generateImgAlts(md0.imgsById);
     const md1 = this.fillAltsInMd(md0, alts);
     console.log("md1:\n", md1);
+    return md1;
     // Revise markdown
     console.log("revise md");
     const md2 = await this.reviseCombinedMd(md1, pdfBuffer);
