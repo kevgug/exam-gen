@@ -1,15 +1,15 @@
 import OpenAI from "openai";
 import { openai } from "@ai-sdk/openai";
 import { generateObject } from "ai";
-import { Exam, ExamPart } from "../../shared/types/exam";
-import { ComputeAnswerService } from "./services/computeAnswer";
-import { PromptService } from "./services/prompt";
+import { Exam, ExamPart } from "../../../shared/types/exam";
+import { ComputeAnswerService } from "./computeAnswer";
+import { PromptService } from "./prompt";
 
-export class ExamCore {
+export class ExamService {
   public static async getFromMarkdown(mdStr: string): Promise<Exam> {
     // Invoke LLM
-    const schemaInfo = PromptService.schemaInfo("ExamCore_markdownToJson");
-    const system = await PromptService.system("ExamCore_markdownToJson");
+    const schemaInfo = PromptService.schemaInfo("ExamService_markdownToJson");
+    const system = await PromptService.system("ExamService_markdownToJson");
     const { object } = await generateObject({
       model: openai("o3-mini"),
       system: system.text,

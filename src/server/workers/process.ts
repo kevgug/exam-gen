@@ -3,7 +3,7 @@ dotenv.config();
 
 import { readFile, writeFile } from "node:fs/promises";
 import { OcrService } from "../core/services/ocr";
-import { ExamCore } from "../core/exam";
+import { ExamService } from "../core/services/exam";
 
 if (!process.send) {
   console.error("error: no IPC. were we forked?");
@@ -33,7 +33,7 @@ const path = process.argv[2];
   console.log(`[WORKER#${process.pid}] ocr done. parsing questions...`);
   //   writeFile("tmp.md", md);
 
-  const exam = await ExamCore.getFromMarkdown(md);
+  const exam = await ExamService.getFromMarkdown(md);
   //   writeFile("tmp.json", JSON.stringify(exam));
 
   console.log(

@@ -3,7 +3,7 @@ dotenv.config();
 
 import { readFile, writeFile } from "node:fs/promises";
 import { OcrService } from "../core/services/ocr";
-import { ExamCore } from "../core/exam";
+import { ExamService } from "../core/services/exam";
 import { Exam } from "../../shared/types/exam";
 
 if (!process.send) {
@@ -18,7 +18,7 @@ if (!process.send) {
   let exams: Exam[];
 
   const gen = async () => {
-    const exam = await ExamCore.generateNew({
+    const exam = await ExamService.generateNew({
       className: "physics",
       classDescription: "IB Physics HL",
       pastExams: exams,
