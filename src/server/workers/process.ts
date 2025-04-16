@@ -33,7 +33,7 @@ const path = process.argv[2];
   console.log(`[WORKER#${process.pid}] ocr done. parsing questions...`);
   //   writeFile("tmp.md", md);
 
-  const exam = await ExamService.getFromMarkdown(md);
+  const exam = await ExamService.markdownToJson(md);
   //   writeFile("tmp.json", JSON.stringify(exam));
 
   console.log(

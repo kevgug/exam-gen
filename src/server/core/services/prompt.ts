@@ -4,10 +4,12 @@ import { readFile } from "fs/promises";
 import { PROMPT_DIR } from "../../config";
 import path from "path";
 
-export type PromptName =
+export type SystemPromptName =
   | "ExamService_markdownToJson"
+  | "ExamService_newExam"
   | "OcrService_generateImgAlts"
   | "OcrService_reviseOcrMarkdown";
+export type UserPromptName = "ExamService_newExam";
 export type SchemaInfo = {
   schemaName: string;
   schemaDescription: string;
@@ -28,16 +30,34 @@ export class Prompt {
   fillVar(varName: string, fillValue: string): Prompt {
     return new Prompt(this.text.replace(`{{${varName}\\}}`, fillValue));
   }
+
+  fillVars(fillValues: Record<string, string>): Prompt {
+    let newText = this.text;
+    for (const [varName, fillValue] of Object.entries(fillValues)) {
+      newText = newText.replace(`{{${varName}\}}`, fillValue);
+    }
+    return new Prompt(newText);
+  }
 }
 
 export class PromptService {
-  public static async system(promptName: PromptName): Promise<Prompt> {
+  public static async system(promptName: SystemPromptName): Promise<Prompt> {
     return new Prompt(
-      (await readFile(path.join(PROMPT_DIR, `${promptName}.md`))).toString(),
+      (
+        await readFile(path.join(PROMPT_DIR, "system", `${promptName}.md`))
+      ).toString(),
     );
   }
 
-  public static schemaInfo(promptName: PromptName): SchemaInfo {
+  public static async user(promptName: UserPromptName): Promise<Prompt> {
+    return new Prompt(
+      (
+        await readFile(path.join(PROMPT_DIR, "user", `${promptName}.md`))
+      ).toString(),
+    );
+  }
+
+  public static schemaInfo(promptName: SystemPromptName): SchemaInfo {
     switch (promptName) {
       case "ExamService_markdownToJson":
         const ExamPartChunk = z.object({

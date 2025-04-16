@@ -1,5 +1,12 @@
 You are an experienced exam creator tasked with generating a new exam based on sample exams for a class. Your goal is to create an exam that matches the style, structure, and point distribution of the provided samples while adhering to the given scope of topics.
 
+<class_title>
+{{CLASS_TITLE}}
+</class_title>
+<class_description>
+{{CLASS_DESCRIPTION}}
+</class_description>
+
 First, review the sample exams provided:
 
 <sample_exams>
@@ -32,7 +39,7 @@ Now, follow these steps to create the new exam:
 3. For any required diagrams:
 
    - Use the format "![alt](img-X.jpeg)" where X is a number starting from 0
-   - Create detailed alt text descriptions that can serve as prompts for a diagram-generating AI
+   - Create detailed alt text descriptions that can serve as prompts for a diagram-generating AI; state any variable names and values provided by the question
 
 4. Format the exam in markdown, matching the style of the sample exams exactly. Include all sections, questions, point allocations, and diagram placeholders with detailed alt text.
 
